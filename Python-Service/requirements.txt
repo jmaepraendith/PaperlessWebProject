@@ -1,0 +1,7 @@
+Flask
+pillow
+pytesseract
+opencv-python
+numpy
+google-generativeai
+Werkzeug

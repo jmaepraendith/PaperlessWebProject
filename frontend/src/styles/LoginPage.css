@@ -1,0 +1,86 @@
+/* Login Page Container */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #EBEDE8;
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.logo {
+    width: 300px;
+}
+
+login-h1 {
+    font-size: 45px;
+    font-weight: 700;
+    color: #073127;
+    margin-top: -45px;
+    margin-bottom: 40px;
+}
+
+
+form {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+
+label {
+    font-size: 20px;
+    font-weight: 700;
+    color: #073127;
+}
+
+input {
+    height: 40px;
+    padding: 5px 10px;
+    border: 1px solid rgba(7, 49, 39, 0.8);
+    border-radius: 5px;
+    background-color: #EBEDE8;
+    font-size: 16px;
+    color: #073127;
+}
+
+/* Input Placeholder */
+input::placeholder {
+    color: rgba(7, 49, 39, 0.4);
+}
+
+/* Login Button */
+button {
+    height: 50px;
+    background-color: #004838;
+    color: #FFFFFF;
+    font-size: 20px;
+    font-weight: 700;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+button:hover {
+    background-color: #073127;
+}
+
+/* Links */
+p {
+    font-size: 16px;
+    color: rgba(7, 49, 39, 0.5);
+    text-align: center;
+}
+
+p a {
+    color: #073127;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
