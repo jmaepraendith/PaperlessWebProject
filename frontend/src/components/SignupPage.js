@@ -12,32 +12,52 @@ const SignupPage = () => {
 
     const handleSignup = async (e) => {
         e.preventDefault();
-
-        if (password !== confirmPassword) {
-            alert('Passwords do not match!');
+    
+        // Check for empty fields
+        if (!email || !username || !password || !confirmPassword) {
+            alert('All fields are required.');
             return;
         }
-
+    
+        // Check for email format
+        if (!/\S+@\S+\.\S+/.test(email)) {
+            alert('Invalid email format. Please enter a valid email.');
+            return;
+        }
+    
+        // Check for password length
+        if (password.length < 8) {
+            alert('Password should be at least 8 characters long.');
+            return;
+        }
+    
+        // Check for password match
+        if (password !== confirmPassword) {
+            alert('Passwords do not match. Please try again.');
+            return;
+        }
+    
         try {
-            await axios.post('http://localhost:3000/api/users/signup', {
-                email,
-                username,
-                password,
-            });
-
-            alert('Account created successfully!');
-            navigate('/login'); // Redirect to login page
+            const response = await axios.post('http://localhost:13889/paperless/signup', { email, username, password });
+            console.log('API Response:', response.data);
+        
+            if (response.data.error) {
+                alert(response.data.error);
+            } else {
+                alert('Signup successful!');
+                navigate('/login');
+            }
         } catch (error) {
+            console.error('API Error:', error.response?.data || error.message);
             alert('Signup failed. Please try again.');
-            console.error(error);
         }
     };
 
     return (
         <div className="signup-container">
             <img src="/logo512.png" alt="Paperless Flow Logo" className="logo" />
-            <signup-h1>Create new account</signup-h1>
-            <signup-form onSubmit={handleSignup}>
+            <h1>Create new account</h1>
+            <form onSubmit={handleSignup}>
                 <div className="form-group">
                     <label htmlFor="email">Email</label>
                     <input
@@ -83,7 +103,7 @@ const SignupPage = () => {
                     />
                 </div>
                 <button type="submit">Sign Up</button>
-            </signup-form>
+            </form>
             <p>
                 Already have an account? <a href="/login">Login</a>
             </p>

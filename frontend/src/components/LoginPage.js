@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../styles/LoginPage.css'; // Ensure correct path
+import '../styles/LoginPage.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -11,19 +11,31 @@ const LoginPage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
 
-        try {
-            const response = await axios.post('http://localhost:3000/api/users/login', {
-                username,
-                password,
-            });
+        // Check for empty fields
+        if (!username || !password) {
+            alert('All fields are required.');
+            return;
+        }
 
-            if (response.data.token) {
+        try {
+            const response = await axios.post('http://localhost:13889/paperless/login', { username, password });
+            console.log('API Response:', response.data);
+        
+            if (response.data.error) {
+                alert(response.data.error);
+            } else {
                 alert('Login successful!');
-                navigate('/dashboard'); // Redirect to dashboard
+                navigate('/homepage'); 
             }
         } catch (error) {
-            alert('Invalid username or password.');
-            console.error(error);
+            if (error.response && error.response.status === 404) {
+                alert('User not found.');
+            } else if (error.response && error.response.status === 401) {
+                alert('Invalid password.');
+            } else {
+                alert('An error occurred during login.');
+            }
+            console.error('Login error:', error);
         }
     };
 
@@ -31,10 +43,8 @@ const LoginPage = () => {
         <div className="login-container">
             <img src="/logo512.png" alt="Paperless Flow Logo" className="logo" />
             <login-h1>Login to your account</login-h1>
-
-            {/* Login Form */}
-            <login-form onSubmit={handleLogin}>
-                <div>
+            <form onSubmit={handleLogin}>
+                <div className="form-group">
                     <label htmlFor="username">Username</label>
                     <input
                         id="username"
@@ -45,7 +55,7 @@ const LoginPage = () => {
                         required
                     />
                 </div>
-                <div>
+                <div className="form-group">
                     <label htmlFor="password">Password</label>
                     <input
                         id="password"
@@ -57,10 +67,9 @@ const LoginPage = () => {
                     />
                 </div>
                 <button type="submit">Login</button>
-            </login-form>
-
+            </form>
             <p>
-                Don't have an account? <a href="/signup">Sign Up to Create an account</a>
+                Don't have an account? <a href="/signup">Sign Up</a>
             </p>
         </div>
     );

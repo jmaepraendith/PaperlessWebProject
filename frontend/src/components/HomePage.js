@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const UploadPage = () => {
+const HomePage = () => {
     const [file, setFile] = useState(null);
     const [output, setOutput] = useState(null);
 
@@ -53,4 +53,4 @@ const UploadPage = () => {
     );
 };
 
-export default UploadPage;
+export default HomePage;

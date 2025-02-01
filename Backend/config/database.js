@@ -6,7 +6,6 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
   port: process.env.DB_PORT || 3306,
   dialect: 'mysql',
 });
-
 sequelize.authenticate()
   .then(() => {
     console.log('Connection has been established successfully.');
@@ -23,4 +22,5 @@ sequelize.sync({ alter: false })  // `alter: false` prevents Sequelize from tryi
     console.error('Failed to sync database:', error);
   });
 
-module.exports = sequelize;
+  module.exports = sequelize;
+
