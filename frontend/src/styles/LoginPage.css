@@ -1,4 +1,3 @@
-/* Login Page Container */
 .login-container {
     display: flex;
     flex-direction: column;
@@ -7,28 +6,30 @@
     min-height: 100vh;
     background-color: #EBEDE8;
     font-family: 'IBM Plex Mono', monospace;
+    gap: 10px;
 }
 
-.logo {
+.logo-login{
     width: 300px;
+    margin-top: -70px;
 }
 
-login-h1 {
-    font-size: 45px;
+.login-h1 {
+    font-size: 40px;
     font-weight: 700;
     color: #073127;
-    margin-top: -45px;
-    margin-bottom: 40px;
+    margin-top: -50px;
+    padding-bottom: 20px;
+
 }
 
 
-form {
-    width: 400px;
+.form-group {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 15px;
 }
-
+  
 
 label {
     font-size: 20px;
@@ -36,39 +37,39 @@ label {
     color: #073127;
 }
 
-input {
+.input_login {
     height: 40px;
     padding: 5px 10px;
     border: 1px solid rgba(7, 49, 39, 0.8);
-    border-radius: 5px;
+    border-radius: 10px;
     background-color: #EBEDE8;
     font-size: 16px;
     color: #073127;
 }
 
-/* Input Placeholder */
-input::placeholder {
+.input_login::placeholder {
     color: rgba(7, 49, 39, 0.4);
 }
 
-/* Login Button */
-button {
+.submit_login {
     height: 50px;
+    width: 400px;
     background-color: #004838;
     color: #FFFFFF;
     font-size: 20px;
     font-weight: 700;
     border: none;
-    border-radius: 5px;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
 }
 
-button:hover {
+.submit_button:hover {
     background-color: #073127;
 }
 
-/* Links */
 p {
     font-size: 16px;
     color: rgba(7, 49, 39, 0.5);

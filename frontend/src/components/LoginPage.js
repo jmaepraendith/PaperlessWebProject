@@ -41,8 +41,8 @@ const LoginPage = () => {
 
     return (
         <div className="login-container">
-            <img src="/logo512.png" alt="Paperless Flow Logo" className="logo" />
-            <login-h1>Login to your account</login-h1>
+            <img src="/logo512.png" alt="Paperless Flow Logo" className="logo-login" />
+            <h1 className="login-h1">Login to your account</h1>
             <form onSubmit={handleLogin}>
                 <div className="form-group">
                     <label htmlFor="username">Username</label>
@@ -50,8 +50,9 @@ const LoginPage = () => {
                         id="username"
                         type="text"
                         value={username}
+                        className='input_login'
                         onChange={(e) => setUsername(e.target.value)}
-                        placeholder="Username"
+                        placeholder="Enter your username"
                         required
                     />
                 </div>
@@ -61,18 +62,19 @@ const LoginPage = () => {
                         id="password"
                         type="password"
                         value={password}
+                        className='input_login'
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Password"
+                        placeholder="Enter your password"
                         required
                     />
                 </div>
-                <button type="submit">Login</button>
+                <button className='submit_login' type="submit">Login</button>
             </form>
             <p>
                 Don't have an account? <a href="/signup">Sign Up</a>
             </p>
         </div>
-    );
+    );    
 };
 
 export default LoginPage;

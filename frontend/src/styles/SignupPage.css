@@ -7,22 +7,30 @@
     min-height: 100vh;
     background-color: #EBEDE8;
     font-family: 'IBM Plex Mono', monospace;
-    text-align: center;
+    
 }
 
-/* Logo */
-.logo {
+.logo-signup{
     width: 300px;
-   
+    margin-top: -70px;
 }
 
-/* Heading */
-signup-h1 {
-    font-size: 45px;
+.input-row {
+    display: flex;
+    gap: 30px; 
+    justify-content: center;
+}
+
+
+
+.signup-h1 {
+    font-size: 40px;
     font-weight: 700;
     color: #073127;
     margin-top: -50px;
-    margin-bottom: 40px;
+    padding-top: 10px;
+    padding-bottom: 20px;
+
 }
 
 form {
@@ -39,9 +47,9 @@ label {
     text-align: left;
 }
 
-/* Input Fields */
-input {
+.input_signup {
     height: 40px;
+    width: 280px;
     padding: 5px 10px;
     border: 1px solid rgba(7, 49, 39, 0.8);
     border-radius: 10px;
@@ -51,12 +59,11 @@ input {
 }
 
 /* Input Placeholder */
-input::placeholder {
+.input_signup::placeholder {
     color: rgba(7, 49, 39, 0.4);
 }
 
-/* Button */
-button {
+.submit_signup {
     height: 50px;
     background-color: #004838;
     color: white;
@@ -64,11 +71,13 @@ button {
     font-weight: 700;
     border: none;
     border-radius: 10px;
+    margin-top: 15px;
+    margin-bottom: 10px;
     cursor: pointer;
     transition: background-color 0.3s ease-in-out;
 }
 
-button:hover {
+.submit_button:hover {
     background-color: #00694e;
 }
 
@@ -76,7 +85,7 @@ button:hover {
 p {
     font-size: 16px;
     color: rgba(7, 49, 39, 0.5);
-    margin-top: 10px;
+    margin-bottom: -5px;
 }
 
 p a {
@@ -87,4 +96,8 @@ p a {
 
 p a:hover {
     text-decoration: underline;
+}
+
+.submit_button {
+    margin-top: 15px;
 }

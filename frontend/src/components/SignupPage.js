@@ -55,63 +55,71 @@ const SignupPage = () => {
 
     return (
         <div className="signup-container">
-            <img src="/logo512.png" alt="Paperless Flow Logo" className="logo" />
-            <h1>Create new account</h1>
+            <img src="/logo512.png" alt="Paperless Flow Logo" className="logo-signup" />
+            <h1 className='signup-h1'>Create new account</h1>
             <form onSubmit={handleSignup}>
-                <div className="form-group">
-                    <label htmlFor="email">Email</label>
-                    <input
-                        id="email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Email"
-                        required
-                    />
+                {/* Username & Email */}
+                <div className="input-row">
+                    <div className="form-group">
+                        <label htmlFor="email">Email</label>
+                        <input
+                            id="email"
+                            type="email"
+                            value={email}
+                            className='input_signup'
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Email"
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="username">Username</label>
+                        <input
+                            id="username"
+                            type="text"
+                            value={username}
+                            className='input_signup'
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="Username"
+                            required
+                        />
+                    </div>
                 </div>
-                <div className="form-group">
-                    <label htmlFor="username">Username</label>
-                    <input
-                        id="username"
-                        type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        placeholder="Username"
-                        required
-                    />
+    
+                {/* Password & Confirm Password */}
+                <div className="input-row">
+                    <div className="form-group">
+                        <label htmlFor="password">Password</label>
+                        <input
+                            id="password"
+                            type="password"
+                            value={password}
+                            className='input_signup'
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Password"
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="confirmPassword">Confirm Password</label>
+                        <input
+                            id="confirmPassword"
+                            type="password"
+                            value={confirmPassword}
+                            className='input_signup'
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Confirm Password"
+                            required
+                        />
+                    </div>
                 </div>
-                <div className="form-group">
-                    <label htmlFor="password">Password</label>
-                    <input
-                        id="password"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Password"
-                        required
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="confirmPassword">Confirm Password</label>
-                    <input
-                        id="confirmPassword"
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Confirm Password"
-                        required
-                    />
-                </div>
-                <button type="submit">Sign Up</button>
+    
+                <button className='submit_signup' type="submit">Sign Up</button>
             </form>
-            <p>
-                Already have an account? <a href="/login">Login</a>
-            </p>
-            <p>
-                or Use without Login
-            </p>
+            <p>Already have an account? <a href="/login">Login</a></p>
+            <p>or Use without Login</p>
         </div>
-    );
+    );    
 };
 
 export default SignupPage;
