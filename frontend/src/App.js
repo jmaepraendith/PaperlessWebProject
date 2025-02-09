@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
 import SignupPage from './components/SignupPage';
 import HomePage from './components/HomePage';
+import ResetPasswordPage from './components/ResetPasswordPage';
+import ActivityPage from './components/ActivityPage';
 
 const App = () => {
     return (
@@ -12,6 +14,8 @@ const App = () => {
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/homepage" element={<HomePage />} />
+                <Route path="/resetpassword" element={<ResetPasswordPage />} />
+                <Route path="/activity" element={<ActivityPage />} />
             </Routes>
         </Router>
     );

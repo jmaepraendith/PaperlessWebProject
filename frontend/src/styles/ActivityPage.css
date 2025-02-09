@@ -1,0 +1,138 @@
+.activity-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #EBEDE8;
+    font-family: 'IBM Plex Mono', monospace;
+    gap: 20px;
+}
+
+.logo-activity{
+    width: 160px;
+    margin-left: 100px;
+}
+
+header {
+    position: fixed; 
+    height: 85px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #EBEDE8;
+    color: #073127;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(174, 174, 174, 0.1);
+}
+
+.nav-header {
+    display: flex;
+    gap: 80px;
+    margin-right: 150px;
+}
+
+.nav-header a {
+    color: #073127;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: normal;
+}
+
+.nav-header a:hover {
+    text-decoration: underline;
+}
+
+.AllToolsLink {
+    margin-right: 100px;
+}
+
+main {
+    padding: 80px 20px 20px; 
+    width: 80%;
+    margin: 0 auto;
+}
+
+.Activity-h1 {
+    font-size: 35px;
+    color: #073127;
+    font-weight: bold;
+    margin-bottom: 20px;
+    position: fixed;
+    top: 120px;
+    left: 120px;
+}
+
+.activity {
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.activity:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.date {
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 12px;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.folder-icon {
+    font-size: 24px;
+    color: #073127;
+}
+
+.file-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #073127;
+}
+
+.btn {
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background 0.3s ease;
+}
+
+.preview {
+    background: #004838;
+    color: white;
+}
+
+.download {
+    background: #004838;
+    color: white;
+}
+
+.preview:hover {
+    background: #005543;
+}
+
+.download:hover {
+    background: #005543;
+}
+
+.activity-item button {
+    margin-left: 10px;
+}
