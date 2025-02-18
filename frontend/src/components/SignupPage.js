@@ -132,7 +132,7 @@ const SignupPage = () => {
                 <button className='submit_signup' type="submit">Sign Up</button>
             </form>
             <p>Already have an account? <a href="/login">Login</a></p>
-            <p>or Use without Login</p>
+            <p>or <a href="/homepage">Use without Login</a></p>
         </div>
     );    
 };
