@@ -5,3 +5,5 @@ opencv-python
 numpy
 google-generativeai
 Werkzeug
+easyocr
+pandas

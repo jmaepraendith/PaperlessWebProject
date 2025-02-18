@@ -1,10 +1,10 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('./config/database');
+const sequelize = require('../config/database');
 const User = require('./User');
 
 const Project = sequelize.define('Project', {
     file_ID: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         primaryKey: true,
         autoIncrement: true,
     },
@@ -24,7 +24,7 @@ const Project = sequelize.define('Project', {
         },
     },
 }, {
-    tableName: 'Project',
+    tableName: 'project',
     timestamps: false,
 });
 

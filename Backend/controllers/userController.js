@@ -42,7 +42,7 @@ exports.signup = async (req, res) => {
         return res.status(201).json({ message: 'User registered successfully', user: newUser });
 
     } catch (error) {
-        // Log error details for debugging
+        // for debugging
         console.error('Signup error:', error);
 
         // Return appropriate error response
@@ -72,7 +72,7 @@ exports.login = async (req, res) => {
             return res.status(401).json({ error: 'Invalid password' });
         }
 
-        // If password is valid, return success response
+        // If password is vali
         res.status(200).json({ message: 'Login successful', user });
     } catch (error) {
         console.error('Error during login:', error);
@@ -87,14 +87,12 @@ exports.getAllUsers = async (req, res) => {
         // Fetch all users from the database
         const users = await User.findAll();
         
-        // If users exist, return them as a response
         if (users) {
             res.status(200).json(users);
         } else {
             res.status(404).json({ message: 'No users found' });
         }
     } catch (error) {
-        // Handle any errors
         console.error('Error fetching users:', error);
         res.status(500).json({ error: 'Failed to fetch users' });
     }

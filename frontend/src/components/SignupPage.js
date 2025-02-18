@@ -42,14 +42,29 @@ const SignupPage = () => {
             console.log('API Response:', response.data);
         
             if (response.data.error) {
-                alert(response.data.error);
+                if (response.data.error.includes("email")) {
+                    alert("Email already exists. Please use a different email.");
+                } else if (response.data.error.includes("username")) {
+                    alert("Username already exists. Please use a different username.");
+                } else {
+                    alert(response.data.error); 
+                }
             } else {
                 alert('Signup successful!');
                 navigate('/login');
             }
         } catch (error) {
-            console.error('API Error:', error.response?.data || error.message);
-            alert('Signup failed. Please try again.');
+            if (error.response) {
+                if (error.response.status === 400) {
+                    alert(error.response.data.error || 'Signup failed. Please try again.');
+                } else if (error.response.status === 500) {
+                    alert('Internal server error. Please try again later.');
+                }
+            } else {
+                console.error('API Error:', error.response?.data || error.message);
+                alert('Signup failed. Please try again.');
+            }
+            
         }
     };
 
