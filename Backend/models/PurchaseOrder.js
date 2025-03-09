@@ -3,19 +3,23 @@ const sequelize = require('../config/database');
 const Project = require('./Project');
 
 const PurchaseOrder = sequelize.define('PurchaseOrder', {
-  file_ID: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    references: {
-        model: Project,
-        key: 'file_ID',
-    },
-  },
   index_file: {
     type: DataTypes.INTEGER,
     allowNull: false,
     autoIncrement: true,
     primaryKey: true,
+  },
+  file_ID: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    references: {
+      model: Project,
+      key: 'file_ID',
+    },
+  },
+  file_type: {
+    type: DataTypes.STRING,
+    allowNull: false,
   },
   fileimagename: {
     type: DataTypes.STRING,
@@ -33,8 +37,12 @@ const PurchaseOrder = sequelize.define('PurchaseOrder', {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  product_description: {
+  product_item: {
     type: DataTypes.STRING,
+    allowNull: true,
+  },
+  description: {
+    type: DataTypes.TEXT,
     allowNull: true,
   },
   quantity: {
@@ -42,29 +50,32 @@ const PurchaseOrder = sequelize.define('PurchaseOrder', {
     allowNull: true,
   },
   unit_price: {
-    type: DataTypes.FLOAT,
+    type: DataTypes.DECIMAL(10,2),
     allowNull: true,
   },
-  total_price: {
-    type: DataTypes.FLOAT,
+  total_product_price: {
+    type: DataTypes.DECIMAL(10,2),
     allowNull: true,
   },
-  order_status: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  delivery_date: {
-    type: DataTypes.DATE,
+  all_product_total_price: {
+    type: DataTypes.DECIMAL(10,2),
     allowNull: true,
   },
   supplier_name: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-}
-, {
-    tableName: 'purchaseOrder',
-    timestamps: false,
+  order_status: {
+    type: DataTypes.ENUM('Pending','Shipped','Completed'),
+    allowNull: true,
+  },
+  delivery_date: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+}, {
+  tableName: 'PurchaseOrder',
+  timestamps: false,
 });
 
 module.exports = PurchaseOrder;

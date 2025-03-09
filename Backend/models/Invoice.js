@@ -3,29 +3,29 @@ const sequelize = require('../config/database');
 const Project = require('./Project');
 
 const Invoice = sequelize.define('Invoice', {
-  file_ID: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    references: {
-        model: Project,
-        key: 'file_ID',
-    },
-  },
   index_file: {
     type: DataTypes.INTEGER,
     allowNull: false,
     autoIncrement: true,
     primaryKey: true,
   },
+  file_ID: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    references: {
+      model: Project,
+      key: 'file_ID',
+    },
+  },
+  file_type: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   fileimagename: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  buyer_name: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  seller_name: {
+  invoice_number: {
     type: DataTypes.STRING,
     allowNull: true,
   },
@@ -33,12 +33,20 @@ const Invoice = sequelize.define('Invoice', {
     type: DataTypes.DATE,
     allowNull: true,
   },
-  invoice_number: {
+  seller_name: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  buyer_name: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  product_item: {
     type: DataTypes.STRING,
     allowNull: true,
   },
   description: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true,
   },
   quantity: {
@@ -46,19 +54,23 @@ const Invoice = sequelize.define('Invoice', {
     allowNull: true,
   },
   unit_price: {
-    type: DataTypes.FLOAT,
+    type: DataTypes.DECIMAL(10,2),
     allowNull: true,
   },
-  total_before_tax: {
-    type: DataTypes.FLOAT,
+  total_product_price: {
+    type: DataTypes.DECIMAL(10,2),
+    allowNull: true,
+  },
+  all_total_before_tax: {
+    type: DataTypes.DECIMAL(10,2),
     allowNull: true,
   },
   vat: {
-    type: DataTypes.FLOAT,
+    type: DataTypes.DECIMAL(10,2),
     allowNull: true,
   },
-  total_amount_including_VAT: {
-    type: DataTypes.FLOAT,
+  all_total_amount_including_VAT: {
+    type: DataTypes.DECIMAL(10,2),
     allowNull: true,
   },
   payment_terms: {
@@ -70,9 +82,8 @@ const Invoice = sequelize.define('Invoice', {
     allowNull: true,
   },
 }, {
-    tableName: 'invoice',
-    timestamps: false,
-}
-);
+  tableName: 'Invoice',
+  timestamps: false,
+});
 
 module.exports = Invoice;
