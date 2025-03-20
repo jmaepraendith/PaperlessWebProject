@@ -12,6 +12,9 @@ router.get('/getExcelFile/:file_ID', projectController.exportToExcelFile);
 router.get('/excel-data/:file_ID', projectController.getDataEachTable_File_ID);
 router.get('/activities/:username', projectController.getAllProject);
 router.put('/projects/update/:file_ID', projectController.updateFileName);
+router.post('/reset-password', userController.resetPassword);
+router.post('/verify-code', userController.verifyCodeAndUpdatePassword);
+
 
 
 

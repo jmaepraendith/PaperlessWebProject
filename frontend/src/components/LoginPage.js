@@ -74,6 +74,9 @@ const LoginPage = () => {
             <p>
                 Don't have an account? <a href="/signup">Sign Up</a>
             </p>
+            <p>
+                <a href="/resetpassword">Forget Password</a>
+            </p>
         </div>
     );    
 };

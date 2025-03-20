@@ -125,7 +125,7 @@ const ActivityPage = () => {
             </section>
           ))
         ) : (
-          <p>No activities found.</p>
+          <p>You haven't created any project yet.</p>
         )}
       </main>
     </div>
