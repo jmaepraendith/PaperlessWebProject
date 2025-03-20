@@ -26,7 +26,7 @@ const LoginPage = () => {
             } else {
                 alert('Login successful!');
                 localStorage.setItem('username', username);
-                navigate('/homepage'); 
+                navigate(`/homepage/${username}`);
             }
         } catch (error) {
             if (error.response && error.response.status === 404) {

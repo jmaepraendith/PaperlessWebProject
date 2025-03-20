@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useNavigate,useParams } from 'react-router-dom';
+import "../styles/HomePage.css";
 import axios from 'axios';
 
 const HomePage = () => {
@@ -7,6 +9,9 @@ const HomePage = () => {
   const [fileID, setFileID] = useState(null);
   const [jsonData, setJsonData] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const navigate = useNavigate();
+  const { username } = useParams();
+  
 
   const handleFileChange = (e) => {
     setFiles([...e.target.files]);
@@ -27,13 +32,15 @@ const HomePage = () => {
     
     
     // Retrieve the username from localStorage instead of hardcoding it
-    const loggedInUsername = localStorage.getItem('username');
-    if (!loggedInUsername) {
-      alert("No logged-in user found. Please log in again.");
-      setProcessing(false);
-      return;
-    }
-    formData.append('username', loggedInUsername);
+    // const loggedInUsername = localStorage.getItem('username');
+    // if (!loggedInUsername) {
+    //   alert("No logged-in user found. Please log in again.");
+    //   setProcessing(false);
+    //   return;
+    // }
+    formData.append('username', username);
+
+   
 
     try {
       
@@ -51,8 +58,43 @@ const HomePage = () => {
     }
   };
 
+  const handleDownload = async (file_ID) => {
+    try {
+        const response = await axios.get(`http://localhost:13889/paperless/getExcelFile/${file_ID}`, {
+            responseType: 'blob' // Important for file downloads
+        });
+
+        // Create a link to trigger download
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `Project_${file_ID}.xlsx`); // Set file name
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error("Error downloading file:", error);
+    }
+};
+
+
   return (
     <div className="container">
+  
+      <header>
+        <img src="/headerLogo.png" alt="Paperless Flow Logo" className="logo-activity" />
+        <nav className="nav-header">
+          <p>
+            <button className="Activity-Project" onClick={() => navigate(`/activity/${username}`)}>
+              <a>Your Projects</a>
+            </button>
+          </p>
+          <p className="AboutUsLink"><a>About us</a></p>
+          <p className="UserLink"><a>Welcome, {username}!</a></p>
+        </nav>
+      </header>
+     
+      <div className="homepage-container">
       <h1>Documents To Excel</h1>
       <input type="file" multiple onChange={handleFileChange} />
       <button onClick={handleUpload} disabled={processing}>
@@ -68,15 +110,12 @@ const HomePage = () => {
         <div>
           <p>Processed File ID: {fileID}</p>
           {/* Additional UI to select columns and trigger Excel download can be added here */}
+          <button className="btn download" onClick={() => handleDownload(fileID)}>Download</button>
         </div>
       )}
-      {jsonData && (
-        <div>
-          <h2>Extracted JSON Data</h2>
-          <pre>{JSON.stringify(jsonData, null, 2)}</pre>
-        </div>
-      )}
+      </div>
     </div>
+    
   );
 };
 

@@ -1,19 +1,35 @@
-.progress-bar {
+
+  header {
     width: 100%;
-    background-color: #f3f3f3;
-    border-radius: 5px;
-    margin: 10px 0;
-    overflow: hidden;
+    background: #EBEDE8;
+    padding: 10px 0;
+    position: fixed; /* Keeps it at the top */
+    top: 0;
+    left: 0;
+    z-index: 1000; /* Ensures it's above other content */
+  }
+
+  .nav-header {
+    display: flex;
+    gap: 80px;
+    margin-right: 150px;
+}
+
+.nav-header a {
+  color: #073127;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: normal;
+}
+
+.nav-header a:hover {
+  text-decoration: underline;
+}
+  
+  .homepage-container {
+    margin-top: 80px; /* Adjust based on header height */
+    padding: 20px;
+    background-color: #EBEDE8;
+    gap: 20px;
   }
   
-  .progress {
-    height: 20px;
-    background-color: #4caf50;
-    transition: width 0.3s ease;
-  }
-  
-  .progress-text {
-    text-align: center;
-    color: #000;
-    padding: 5px;
-  }

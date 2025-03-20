@@ -21,6 +21,7 @@ header {
     left: 0;
     width: 100%;
     background: #EBEDE8;
+    position: fixed; /* Keeps it at the top */
     color: #073127;
     display: flex;
     justify-content: space-between;

@@ -15,6 +15,11 @@ const Project = sequelize.define('Project', {
     update_date: {
         type: DataTypes.DATE,
     },
+    file_name: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true,
+    },
     username: {
         type: DataTypes.STRING,
         allowNull: false,
