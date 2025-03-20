@@ -133,9 +133,10 @@ exports.updateFileName = async (req, res) => {
         if (!project) {
             return res.status(404).json({ message: "Project not found" });
         }
-
-        await Project.update({ file_name }, { where: { file_ID } });
-
+        
+        const update_date = new Date();
+        await Project.update({ file_name,update_date }, { where: { file_ID } });
+       
         res.json({ message: "File name updated successfully" });
     } catch (error) {
         console.error("Error updating file name:", error);
