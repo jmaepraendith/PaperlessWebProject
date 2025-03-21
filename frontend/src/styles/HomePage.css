@@ -149,6 +149,8 @@ input[type="file"] {
   cursor: not-allowed;
 }
 
+
+
 /* Column selection grid and buttons */
 .column-selection-grid {
   display: grid;

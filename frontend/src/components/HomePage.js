@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import "../styles/HomePage.css";
 import axios from 'axios';
@@ -9,17 +9,19 @@ const HomePage = () => {
   const [fileID, setFileID] = useState(null);
   const [jsonData, setJsonData] = useState(null);
   const [availableColumns, setAvailableColumns] = useState([]);
-  const [selectedColumns, setSelectedColumns] = useState([]);
+  const [selectedColumns, setSelectedColumns] = useState({});
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const navigate = useNavigate();
   const { username } = useParams();
 
+  // Handle file selection
   const handleFileChange = (e) => {
     setFiles([...e.target.files]);
     setUploadProgress(0);
   };
 
+  // Handle file upload
   const handleUpload = async () => {
     if (files.length === 0) {
       alert("Please select at least one file!");
@@ -36,42 +38,15 @@ const HomePage = () => {
       const response = await axios.post('http://localhost:13889/paperless/process', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
+
       setFileID(response.data.file_ID);
       setJsonData(response.data);
-      alert("Files processed successfully!");
 
-      // Set columns based on file type
-      let columns = [];
-      if (response.data.file_type === "Purchase order") {
-        columns = [
-          'file_ID', 'file_type', 'fileimagename', 'purchase_order_number', 'order_date',
-          'customer_name', 'product_item', 'description', 'quantity', 'unit_price',
-          'total_product_price', 'all_product_total_price', 'supplier_name', 'order_status', 'delivery_date'
-        ];
-      } else if (response.data.file_type === "Bill") {
-        columns = [
-          'file_ID', 'file_type', 'fileimagename', 'receipt_number', 'receipt_date', 
-          'payment_description', 'payer_name', 'payment_method', 'product_item', 
-          'description', 'quantity', 'unit_price', 'total_product_price', 
-          'all_product_total_price', 'amount_paid'
-        ];
-      } else if (response.data.file_type === "Invoice") {
-        columns = [
-          'file_ID', 'file_type', 'fileimagename', 'invoice_number', 'invoice_date',
-          'seller_name', 'buyer_name', 'product_item', 'description', 'quantity',
-          'unit_price', 'total_product_price', 'all_total_before_tax', 'vat',
-          'all_total_amount_including_VAT', 'payment_terms', 'payment_method'
-        ];
-      }
-      else {
-        columns = [
-          'file_ID', 'file_type', 'fileimagename', 'purchase_order_number', 'order_date',
-          'customer_name', 'product_item', 'description', 'quantity', 'unit_price',
-          'total_product_price', 'all_product_total_price', 'supplier_name', 'order_status', 'delivery_date'
-        ];
-      }
-      setAvailableColumns(columns);
-      setSelectedColumns(columns); // Initially select all columns
+      alert("Files processed successfully!");  
+
+      // Fetch available columns based on file ID
+      fetchColumns(response.data.file_ID);
+
     } catch (error) {
       console.error("Error processing files:", error);
       alert("Failed to process files.");
@@ -80,30 +55,74 @@ const HomePage = () => {
     }
   };
 
-  const toggleColumnSelection = (column) => {
-    // Just toggle the visual selection state, but keep all columns selected for processing
-    setSelectedColumns(prev => {
-      if (prev.includes(column)) {
-        return prev.filter(col => col !== column);
-      } else {
-        return [...prev, column];
+  // Fetch available columns from the backend
+  const fetchColumns = async (file_ID) => {
+    try {
+      const response = await axios.get(`http://localhost:13889/paperless/get-column-each-table/${file_ID}`);
+      console.log("Columns received:", response.data);
+
+      if (response.data.length > 0) {
+        setAvailableColumns(response.data); // Store the entire table & column structure
+        let allColumns = response.data.flatMap(table => table.columns);
+        setSelectedColumns(allColumns); // Select all columns by default
       }
+    } catch (error) {
+      console.error("Error fetching columns:", error);
+      alert("Failed to retrieve table columns.");
+    }
+  };
+
+  // Handle column selection toggle
+  const toggleColumnSelection = (tableName, column) => {
+    setSelectedColumns(prev => {
+      const updatedTableColumns = prev[tableName] || [];
+  
+      return {
+        ...prev,
+        [tableName]: updatedTableColumns.includes(column)
+          ? updatedTableColumns.filter(col => col !== column)
+          : [...updatedTableColumns, column]
+      };
     });
   };
-
-  const handleConfirmSelection = () => {
+  
+  const handleConfirmSelection = async (fileID) => {
     if (selectedColumns.length === 0) {
-      alert("Please select at least one column!");
-      return;
+        alert("Please select at least one column!");
+        return;
     }
     setIsConfirmed(true);
-    alert("Selection confirmed. Now you can process the data.");
-  };
 
-  const handleDownload = async (file_ID) => {
+    const selectedData = availableColumns
+        .map((table) => ({
+            table: table.table,
+            selectedColumns: selectedColumns[table.table] || [] // Fetch selected columns per table
+        }))
+        .filter(table => table.selectedColumns.length > 0);
+
+    console.log("Sending structured data:", selectedData);
+
     try {
+        const response = await axios.post(
+            `http://localhost:13889/paperless/exportToExcelFile/${fileID}`, 
+            { selectedData } // Wrapped in an object
+        );
+
+        if (response.status === 200) {
+            alert("Excel file created successfully!");
+        }
+    } catch (error) {
+        console.error("Error confirming selection:", error.response ? error.response.data : error.message);
+        alert("Failed to create Excel file.");
+    }
+};
+
+  
+
+const handleDownload = async (file_ID) => {
+  try {
       const response = await axios.get(`http://localhost:13889/paperless/getExcelFile/${file_ID}`, {
-        responseType: 'blob'
+          responseType: 'blob'  // Ensures file is downloaded as binary
       });
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -113,10 +132,12 @@ const HomePage = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    } catch (error) {
+  } catch (error) {
       console.error("Error downloading file:", error);
-    }
-  };
+      alert("Failed to download Excel file.");
+  }
+};
+
 
   return (
     <div className="container">
@@ -152,23 +173,37 @@ const HomePage = () => {
           <div>
             <p className='file-id'>Processed File ID: {fileID}</p>
             <h3>File Type: {jsonData?.file_type}</h3>
-            <h3>Select columns to include in Excel:</h3>
+            <h3>Select columns to include in your Excel:</h3>
+            <p>This file with selected columns will be download only once here.</p> 
+            <p>If you download this file again in "your project" you will get all column.</p>
             
             <div className="column-selection-grid">
-              {availableColumns.map((column) => (
-                <button
-                  key={column}
-                  className={`column-button ${selectedColumns.includes(column) ? 'column-button-selected' : ''}`}
-                  onClick={() => toggleColumnSelection(column)}
-                >
-                  {column}
-                </button>
-              ))}
+              {availableColumns.length > 0 ? (
+                availableColumns.map((table) => (
+                  <div key={table.table} className="table-section">
+                    <h3>{table.table}</h3>
+                    <div className="column-buttons">
+                      {table.columns.map((column) => (
+                        <button
+                          key={column}
+                          className={`column-button ${selectedColumns[table.table]?.includes(column) ? 'column-button-selected' : ''}`}
+                          onClick={() => toggleColumnSelection(table.table, column)}
+                        >
+                          {column}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>Loading columns...</p>
+              )}
             </div>
+
             
             <button
               className="btn-confirm"
-              onClick={handleConfirmSelection}
+              onClick={() => handleConfirmSelection(fileID)}
             >
               Confirm Selection
             </button>

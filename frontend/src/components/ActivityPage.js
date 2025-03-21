@@ -55,7 +55,7 @@ const ActivityPage = () => {
 
   const handleDownload = async (file_ID) => {
     try {
-        const response = await axios.get(`http://localhost:13889/paperless/getExcelFile/${file_ID}`, {
+        const response = await axios.get(`http://localhost:13889/paperless/getExcelFileallcolumn/${file_ID}`, {
             responseType: 'blob' // Important for file downloads
         });
 

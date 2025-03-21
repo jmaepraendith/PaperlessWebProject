@@ -8,14 +8,14 @@ router.post('/process', ocrController.processFiles);
 router.post('/signup', userController.signup);
 router.post('/login', userController.login);
 router.get('/getallusers', userController.getAllUsers);
-router.get('/getExcelFile/:file_ID', projectController.exportToExcelFile);
 router.get('/excel-data/:file_ID', projectController.getDataEachTable_File_ID);
+router.get('/get-column-each-table/:file_ID', projectController.getColumnEachTable);
 router.get('/activities/:username', projectController.getAllProject);
 router.put('/projects/update/:file_ID', projectController.updateFileName);
 router.post('/reset-password', userController.resetPassword);
 router.post('/verify-code', userController.verifyCodeAndUpdatePassword);
 
-
-
-
+router.post('/exportToExcelFile/:file_ID', projectController.exportToExcelFile);
+router.get('/getExcelFile/:file_ID', projectController.getExcelFile);
+router.get('/getExcelFileallcolumn/:file_ID', projectController.allcolumnExcelFile);
 module.exports = router;
