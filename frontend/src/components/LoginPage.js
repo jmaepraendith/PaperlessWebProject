@@ -7,20 +7,20 @@ const LoginPage = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
-
+    
     const handleLogin = async (e) => {
         e.preventDefault();
-
+        
         // Check for empty fields
         if (!username || !password) {
             alert('All fields are required.');
             return;
         }
-
+        
         try {
             const response = await axios.post('http://localhost:13889/paperless/login', { username, password });
             console.log('API Response:', response.data);
-        
+                    
             if (response.data.error) {
                 alert(response.data.error);
             } else {
@@ -39,7 +39,7 @@ const LoginPage = () => {
             console.error('Login error:', error);
         }
     };
-
+    
     return (
         <div className="login-container">
             <img src="/logo512.png" alt="Paperless Flow Logo" className="logo-login" />
@@ -78,7 +78,7 @@ const LoginPage = () => {
                 <a href="/resetpassword">Forget Password</a>
             </p>
         </div>
-    );    
+    );
 };
 
 export default LoginPage;

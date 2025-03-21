@@ -7,32 +7,35 @@
     background-color: #EBEDE8;
     font-family: 'IBM Plex Mono', monospace;
     gap: 10px;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
-.logo-login{
-    width: 300px;
-    margin-top: -70px;
+.logo-login {
+    width: 80%;
+    max-width: 300px;
+    margin-top: -50px;
 }
 
 .login-h1 {
-    font-size: 40px;
+    font-size: clamp(24px, 5vw, 40px);
     font-weight: 700;
     color: #073127;
-    margin-top: -50px;
+    margin-top: -30px;
     padding-bottom: 20px;
-
+    text-align: center;
 }
-
 
 .form-group {
     display: flex;
     flex-direction: column;
     gap: 15px;
+    width: 100%;
+    max-width: 400px;
 }
-  
 
 label {
-    font-size: 20px;
+    font-size: clamp(16px, 4vw, 20px);
     font-weight: 700;
     color: #073127;
 }
@@ -45,6 +48,8 @@ label {
     background-color: #EBEDE8;
     font-size: 16px;
     color: #073127;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .input_login::placeholder {
@@ -53,10 +58,11 @@ label {
 
 .submit_login {
     height: 50px;
-    width: 400px;
+    width: 100%;
+    max-width: 400px;
     background-color: #004838;
     color: #FFFFFF;
-    font-size: 20px;
+    font-size: clamp(16px, 4vw, 20px);
     font-weight: 700;
     border: none;
     margin-top: 15px;
@@ -66,12 +72,12 @@ label {
     transition: all 0.3s ease-in-out;
 }
 
-.submit_button:hover {
+.submit_login:hover {
     background-color: #073127;
 }
 
 p {
-    font-size: 16px;
+    font-size: clamp(14px, 3vw, 16px);
     color: rgba(7, 49, 39, 0.5);
     text-align: center;
 }
@@ -84,4 +90,87 @@ p a {
 
 p a:hover {
     text-decoration: underline;
+}
+
+/* Fix for submit_button vs submit_login inconsistency */
+.submit_button:hover {
+    background-color: #073127;
+}
+
+/* Make form width responsive */
+form {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Media query for mobile devices */
+@media (max-width: 480px) {
+    .login-container {
+        padding: 15px;
+    }
+    
+    .logo-login {
+        margin-top: -30px;
+        max-width: 200px;
+    }
+    
+    .login-h1 {
+        margin-top: -20px;
+        padding-bottom: 15px;
+        font-size: 22px;
+    }
+    
+    .input_login {
+        height: 35px;
+        font-size: 14px;
+        padding: 3px 8px;
+    }
+    
+    .submit_login {
+        height: 40px;
+        font-size: 16px;
+        max-width: 280px;
+    }
+    
+    label {
+        font-size: 16px;
+    }
+    
+    .form-group {
+        gap: 10px;
+        max-width: 280px;
+    }
+    
+    p {
+        font-size: 14px;
+    }
+}
+
+/* Media query for very small devices */
+@media (max-width: 320px) {
+    .logo-login {
+        max-width: 150px;
+    }
+    
+    .login-h1 {
+        font-size: 20px;
+    }
+    
+    .input_login {
+        height: 32px;
+        font-size: 13px;
+    }
+    
+    .submit_login {
+        height: 35px;
+        font-size: 15px;
+        max-width: 250px;
+    }
+    
+    .form-group {
+        max-width: 250px;
+    }
 }
