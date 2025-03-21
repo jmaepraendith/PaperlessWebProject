@@ -1,35 +1,226 @@
-
-  header {
-    width: 100%;
-    background: #EBEDE8;
-    padding: 10px 0;
-    position: fixed; /* Keeps it at the top */
-    top: 0;
-    left: 0;
-    z-index: 1000; /* Ensures it's above other content */
-  }
-
-  .nav-header {
-    display: flex;
-    gap: 80px;
-    margin-right: 150px;
+/* General styles */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #EBEDE8;
+  margin: 0;
+  padding: 0;
+  font-family: 'IBM Plex Mono', monospace;
 }
 
-.nav-header a {
+/* Header */
+header {
+  width: 100%;
+  background: #EBEDE8;
+  padding: 10px 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Navigation */
+.nav-header {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.nav-header a, .nav-header button {
   color: #073127;
   text-decoration: none;
   font-size: 16px;
   font-weight: normal;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
-.nav-header a:hover {
+.nav-header a:hover, .nav-header button:hover {
   text-decoration: underline;
 }
-  
+
+/* Homepage container */
+.homepage-container {
+  margin-top: 80px;
+  padding: 20px;
+  text-align: center;
+}
+
+/* File input and buttons */
+input[type="file"] {
+  margin-top: 10px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.home-h1 {
+  font-size: 40px;
+  font-weight: 700;
+  color: #073127;
+  padding-top: 50px;
+}
+
+.home-h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #07312777;
+  padding-bottom: 20px;
+}
+
+.upload {
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 10px;
+  padding: 10px 15px;
+  margin-left: 20px;
+  background: #004838;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.upload:hover {
+  background: #055a45;
+}
+
+.upload:disabled {
+  background: gray;
+  cursor: not-allowed;
+}
+
+.file-id {
+  font-size: 12px;
+  font-weight: 200;
+  color: #07312777;
+  margin-top: 30px;
+  padding-bottom: 20px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.btn-download {
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 30px;
+  padding: 10px 15px;
+  margin-left: 20px;
+  background: #004838;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-download:hover {
+  background: #055a45;
+}
+
+.btn-download:disabled {
+  background: gray;
+  cursor: not-allowed;
+}
+
+.btn-confirm {
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 30px;
+  padding: 10px 15px;
+  margin-left: 20px;
+  background: #004838;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.btn-confirm:hover {
+  background: #055a45;
+}
+
+.btn-confirm:disabled {
+  background: gray;
+  cursor: not-allowed;
+}
+
+/* Column selection grid and buttons */
+.column-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 20px auto;
+  max-width: 800px;
+  padding: 0 20px;
+}
+
+.column-button {
+  font-size: 14px;
+  padding: 10px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'IBM Plex Mono', monospace;
+  color: #073127;
+  text-align: center;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.column-button:hover {
+  background: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.column-button-selected {
+  background: #004838;
+  color: white;
+  border-color: #004838;
+}
+
+.column-button-selected:hover {
+  background: #055a45;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .nav-header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+
   .homepage-container {
-    margin-top: 80px; /* Adjust based on header height */
-    padding: 20px;
-    background-color: #EBEDE8;
-    gap: 20px;
+    padding: 10px;
+  }
+
+  input[type="file"], button {
+    width: 100%;
+    max-width: 300px;
   }
   
+  .column-selection-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .column-selection-grid {
+    grid-template-columns: 1fr;
+  }
+}
