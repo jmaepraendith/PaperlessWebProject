@@ -16,6 +16,11 @@
   gap: 6px;
 }
 
+.all-column {  
+  font-size: 0.7rem; 
+}
+
+
 .dot {
   width: 8px;
   height: 8px;
@@ -182,13 +187,25 @@ main {
   color: white;
 }
 
-.preview:hover, .download:hover {
+.delete {
+  background: #8e0900;
+  color: white;
+}
+
+.preview:hover, .download:hover , .delete:hover {
   background: #005543;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.preview:active, .download:active {
+.delete:hover {
+  background: #b02600;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+.preview:active, .download:active , .delete:active  {
   transform: translateY(0);
 }
 

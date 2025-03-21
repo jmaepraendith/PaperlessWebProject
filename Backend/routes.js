@@ -14,8 +14,10 @@ router.get('/activities/:username', projectController.getAllProject);
 router.put('/projects/update/:file_ID', projectController.updateFileName);
 router.post('/reset-password', userController.resetPassword);
 router.post('/verify-code', userController.verifyCodeAndUpdatePassword);
-
+router.delete('/deleteProject/:file_ID', projectController.deleteRecordsbyfileID);
 router.post('/exportToExcelFile/:file_ID', projectController.exportToExcelFile);
 router.get('/getExcelFile/:file_ID', projectController.getExcelFile);
 router.get('/getExcelFileallcolumn/:file_ID', projectController.allcolumnExcelFile);
+router.get('/getFileLinkfromDrive/:file_ID', projectController.getFileLinkfromDrive);
+
 module.exports = router;

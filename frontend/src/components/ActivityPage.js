@@ -50,6 +50,64 @@ const ActivityPage = () => {
     }
   };
 
+  const handleDelete = async (file_ID) => {
+    if (!file_ID) {
+        alert("Error: File ID is missing.");
+        return;
+    }
+
+    const confirmDelete = window.confirm("Are you sure you want to delete this project? This action cannot be undone.");
+    
+    if (!confirmDelete) {
+        return; 
+    }
+
+    try {
+        const response = await axios.delete(`http://localhost:13889/paperless/deleteProject/${file_ID}`);
+
+        if (response.status === 200) {
+            alert("Your project has been deleted successfully!");
+            window.location.reload(); // Refresh the page or redirect as needed
+        }
+    } catch (error) {
+        console.error("Error deleting project:", error);
+        alert("Failed to delete project. Please try again.");
+    }
+};
+
+
+const handlePreview = async (file_ID) => {
+  if (!file_ID) {
+      alert("No file selected for preview.");
+      return;
+  }
+
+  try {
+      console.log(`Fetching file link for: ${file_ID}`); // Debugging Step
+
+      const response = await fetch(`http://localhost:13889/paperless/getFileLinkfromDrive/${file_ID}`);
+      
+      if (!response.ok) {
+          throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log("File Response Data:", data); // Debugging Step
+
+      if (data.fileUrl) {
+          console.log("Opening file:", data.fileUrl);
+          window.open(data.fileUrl, '_blank'); // Opens file in a new tab
+      } else {
+          alert("File not found on Google Drive.");
+      }
+  } catch (error) {
+      console.error("Error opening preview:", error);
+      alert(`Error fetching file link: ${error.message}`);
+  }
+};
+
+
+
   const handleDownload = async (file_ID) => {
     try {
       const response = await axios.get(`http://localhost:13889/paperless/getExcelFileallcolumn/${file_ID}`, {
@@ -131,8 +189,9 @@ const ActivityPage = () => {
                   </span>
                 )}
 
-                <button className="btn preview">Preview</button>
-                <button className="btn download" onClick={() => handleDownload(activity.file_ID)}>Download</button>
+                <button className="btn preview" onClick={() => handlePreview(activity.file_ID)}>Preview</button>
+                <button className="btn download" onClick={() => handleDownload(activity.file_ID)}>Download <span className="all-column">(All Column)</span></button>
+                <button className="btn delete" onClick={() => handleDelete(activity.file_ID)}>Delete</button>
               </div>
             </section>
           ))
