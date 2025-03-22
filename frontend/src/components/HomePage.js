@@ -13,6 +13,7 @@ const HomePage = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const { username } = useParams();
 
@@ -61,6 +62,7 @@ const HomePage = () => {
     }
   };
 
+  
   // Fetch available columns from the backend
   const fetchColumns = async (file_ID) => {
     try {
@@ -166,10 +168,33 @@ const HomePage = () => {
     navigate("/homepage");
   };
 
+  const handleChangePassword = () => {
+    // นำทางไปยังหน้าเปลี่ยนรหัสผ่าน
+    navigate("/change-password");
+  };
+
   // Toggle mobile menu
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
+
+  // Toggle user dropdown
+  const toggleUserDropdown = (e) => {
+    e.stopPropagation(); // Prevent event bubbling
+    setUserDropdownOpen(!userDropdownOpen);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const closeDropdown = (e) => {
+      if (userDropdownOpen && !e.target.closest('.user-menu-container')) {
+        setUserDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('click', closeDropdown);
+    return () => document.removeEventListener('click', closeDropdown);
+  }, [userDropdownOpen]);
 
   return (
     <div className="container">
@@ -192,10 +217,22 @@ const HomePage = () => {
           </p>
           <p className="AboutUsLink"><a>About us</a></p>
           <p className="AllToolsLink"><a>All Tools</a></p>
-          <p className="UserLink"><a>Welcome, {username}!</a></p>
-          <p>
-            <a onClick={() => {navigate(`/log-out`); handleLogout(); }}>Log out</a>
-          </p>
+          
+         <div className="user-dropdown-container">
+            <p className="UserLink" onClick={toggleUserDropdown}>
+              <a>Welcome, {username}! <span className="dropdown-arrow">▼</span></a>
+            </p>
+            {userDropdownOpen && (
+              <div className="user-dropdown-menu">
+                <button className="dropdown-item" onClick={handleChangePassword}>
+                  Change Password
+                </button>
+                <button className="dropdown-item logout" onClick={handleLogout}>
+                  Log out
+                </button>
+              </div>
+            )}
+          </div>
         </nav>
       </header>
 

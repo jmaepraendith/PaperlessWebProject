@@ -10,6 +10,7 @@ const ActivityPage = () => {
   const [editingId, setEditingId] = useState(null);
   const [editedName, setEditedName] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   useEffect(() => {
     const fetchActivities = async () => {
@@ -24,6 +25,21 @@ const ActivityPage = () => {
       fetchActivities();
     }
   }, [username]);
+
+  useEffect(() => {
+    // Close user dropdown when clicking outside
+    const handleClickOutside = (event) => {
+      if (userDropdownOpen && !event.target.closest('.user-dropdown-container')) {
+        setUserDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [userDropdownOpen]);
 
   const handleDoubleClick = (file_ID, currentName) => {
     setEditingId(file_ID);
@@ -73,40 +89,37 @@ const ActivityPage = () => {
         console.error("Error deleting project:", error);
         alert("Failed to delete project. Please try again.");
     }
-};
+  };
 
+  const handlePreview = async (file_ID) => {
+    if (!file_ID) {
+        alert("No file selected for preview.");
+        return;
+    }
 
-const handlePreview = async (file_ID) => {
-  if (!file_ID) {
-      alert("No file selected for preview.");
-      return;
-  }
+    try {
+        console.log(`Fetching file link for: ${file_ID}`); // Debugging Step
 
-  try {
-      console.log(`Fetching file link for: ${file_ID}`); // Debugging Step
+        const response = await fetch(`http://localhost:13889/paperless/getFileLinkfromDrive/${file_ID}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+        }
 
-      const response = await fetch(`http://localhost:13889/paperless/getFileLinkfromDrive/${file_ID}`);
-      
-      if (!response.ok) {
-          throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
-      }
+        const data = await response.json();
+        console.log("File Response Data:", data); // Debugging Step
 
-      const data = await response.json();
-      console.log("File Response Data:", data); // Debugging Step
-
-      if (data.fileUrl) {
-          console.log("Opening file:", data.fileUrl);
-          window.open(data.fileUrl, '_blank'); // Opens file in a new tab
-      } else {
-          alert("File not found on Google Drive.");
-      }
-  } catch (error) {
-      console.error("Error opening preview:", error);
-      alert(`Error fetching file link: ${error.message}`);
-  }
-};
-
-
+        if (data.fileUrl) {
+            console.log("Opening file:", data.fileUrl);
+            window.open(data.fileUrl, '_blank'); // Opens file in a new tab
+        } else {
+            alert("File not found on Google Drive.");
+        }
+    } catch (error) {
+        console.error("Error opening preview:", error);
+        alert(`Error fetching file link: ${error.message}`);
+    }
+  };
 
   const handleDownload = async (file_ID) => {
     try {
@@ -130,15 +143,21 @@ const handlePreview = async (file_ID) => {
     setMenuOpen(!menuOpen);
   };
 
+  const toggleUserDropdown = (e) => {
+    e.stopPropagation(); // Prevent event bubbling
+    setUserDropdownOpen(!userDropdownOpen);
+  };
+
   const handleLogout = () => {
-  
     localStorage.clear();
     sessionStorage.clear();
-  
     navigate("/homepage");
   };
   
-  
+  const handleChangePassword = () => {
+    // Add your change password logic here
+    navigate("/change-password"); // Adjust this to your actual route
+  };
 
   return (
     <div className="activity-container">
@@ -168,12 +187,21 @@ const handlePreview = async (file_ID) => {
           <p className="AboutUsLink"><a>About us</a></p>
           <p className="AllToolsLink"><a>All Tools</a></p>
           
-          <p className="UserLink"><a>Welcome, {username}!</a></p>
-          <p>
-            <button className="log-out" onClick={handleLogout}>
-              <a>Log out</a>
-            </button>
-          </p>
+          <div className="user-dropdown-container">
+            <p className="UserLink" onClick={toggleUserDropdown}>
+              <a>Welcome, {username}! <span className="dropdown-arrow">▼</span></a>
+            </p>
+            {userDropdownOpen && (
+              <div className="user-dropdown-menu">
+                <button className="dropdown-item" onClick={handleChangePassword}>
+                  Change Password
+                </button>
+                <button className="dropdown-item logout" onClick={handleLogout}>
+                  Log out
+                </button>
+              </div>
+            )}
+          </div>
         </nav>
       </header>
 
