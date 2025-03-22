@@ -185,7 +185,7 @@ exports.getColumnEachTable = async (req, res) => {
                 const tableColumns = await sequelize.getQueryInterface().describeTable(tableName);
                 return {
                     table: tableName,
-                    columns: Object.keys(tableColumns) // Extract column names
+                    columns: Object.keys(tableColumns).map(col => col.replace(/_/g, ' ')) // Extract column names
                 };
             })
         );
@@ -199,8 +199,8 @@ exports.getColumnEachTable = async (req, res) => {
 
 exports.exportToExcelFile = async (req, res) => {
     try {
-        const { file_ID } = req.params; // Ensure param matches frontend
-        const { selectedData } = req.body; // Destructure properly
+        const { file_ID } = req.params; 
+        const { selectedData } = req.body; 
 
         console.log("Processing Excel export for file ID:", file_ID);
         console.log("Selected Tables & Columns:", selectedData);
@@ -215,7 +215,6 @@ exports.exportToExcelFile = async (req, res) => {
             return res.status(404).json({ message: "Project not found" });
         }
 
-        // Fetch data from relevant tables
         const bills = await Bill.findAll({ where: {  file_ID } });
         const invoices = await Invoice.findAll({ where: {  file_ID } });
         const purchaseOrders = await PurchaseOrder.findAll({ where: {  file_ID } });
@@ -235,11 +234,13 @@ exports.exportToExcelFile = async (req, res) => {
 
                 data.forEach(item => {
                     const row = {};
-                    selectedColumns.forEach(col => {
-                        row[col] = item[col] !== undefined ? item[col] : "N/A";
+                    selectedColumns.forEach(displayCol => {
+                        const dbCol = displayCol.replace(/ /g, '_'); 
+                        row[displayCol] = item[dbCol] !== undefined ? item[dbCol] : "N/A";
                     });
                     worksheet.addRow(row);
                 });
+                
             }
         };
 
@@ -354,7 +355,8 @@ const uploadToGoogleDrive = async (filePath) => {
 
         const fileMetadata = {
             name: path.basename(filePath),
-            parents: ["11Vz-D_TgIRhkixXY5wr6xZnvqejx2Lxe"], // Replace with your folder ID
+            // parents: ["11Vz-D_TgIRhkixXY5wr6xZnvqejx2Lxe"], //  folder ID jj
+            parents: ["1C5bpzb5kU4K2a4MlyecLTk8BvxjClQri"], //  folder ID jp
         };
 
         const media = {

@@ -127,8 +127,18 @@ exports.resetPassword = async (req, res) => {
         const mailOptions = {
             from: process.env.EMAIL_USER,  
             to: user.email,
-            subject: 'Password Reset Code',
-            text: `Your password reset code is: ${verificationCode}`,
+            subject: 'Paperless Web Project: Password Reset Code',
+            text: `Hello ${user.name || ''},
+
+                We received a request to reset your password. Please use the verification code below to proceed:
+
+                🔐 Verification Code: ${verificationCode}
+
+                If you didn't request a password reset, you can safely ignore this email.
+
+                Best regards,  
+                Your Support Team`
+
         };
         
 
