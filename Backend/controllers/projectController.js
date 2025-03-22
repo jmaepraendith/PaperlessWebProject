@@ -354,7 +354,7 @@ const uploadToGoogleDrive = async (filePath) => {
 
         const fileMetadata = {
             name: path.basename(filePath),
-            parents: ["1C5bpzb5kU4K2a4MlyecLTk8BvxjClQri"], // Replace with your folder ID
+            parents: ["11Vz-D_TgIRhkixXY5wr6xZnvqejx2Lxe"], // Replace with your folder ID
         };
 
         const media = {

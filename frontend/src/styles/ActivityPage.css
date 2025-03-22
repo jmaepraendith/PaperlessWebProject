@@ -7,14 +7,6 @@
   position: relative; /* For absolute positioning of the dots */
 }
 
-/* Three dots in the top right corner */
-.three-dots {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  display: flex;
-  gap: 6px;
-}
 
 .all-column {  
   font-size: 0.7rem; 
@@ -70,7 +62,7 @@ header {
 }
 
 /* Hamburger menu - hidden on desktop */
-.hamburger {
+.hamburger-activity {
   display: none;
   flex-direction: column;
   justify-content: space-between;
@@ -80,7 +72,7 @@ header {
   margin-right: 20px;
 }
 
-.hamburger span {
+.hamburger-activity span {
   display: block;
   height: 3px;
   width: 100%;
@@ -123,6 +115,7 @@ main {
   box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.08);
   margin-bottom: 20px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-right: 20px;
 }
 
 .activity:hover {

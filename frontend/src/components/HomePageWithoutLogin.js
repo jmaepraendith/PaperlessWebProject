@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import "../styles/HomePage.css";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import "../styles/HomePage.css";
 
 const HomePageWithoutLogin = () => {
   const [files, setFiles] = useState([]);
@@ -12,6 +12,7 @@ const HomePageWithoutLogin = () => {
   const [selectedColumns, setSelectedColumns] = useState({});
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   // Handle file selection
@@ -34,8 +35,13 @@ const HomePageWithoutLogin = () => {
     formData.append('username', 'NOACCOUNT');
 
     try {
+      // Add upload progress monitoring
       const response = await axios.post('http://localhost:13889/paperless/process', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUploadProgress(percentCompleted);
+        }
       });
 
       setFileID(response.data.file_ID);
@@ -62,8 +68,15 @@ const HomePageWithoutLogin = () => {
 
       if (response.data.length > 0) {
         setAvailableColumns(response.data); // Store the entire table & column structure
-        let allColumns = response.data.flatMap(table => table.columns);
-        setSelectedColumns(allColumns); // Select all columns by default
+        
+        // Initialize selected columns structure
+        // Changed: All columns are now unselected by default for guest users
+        const initialSelected = {};
+        response.data.forEach(table => {
+          initialSelected[table.table] = []; // Start with no columns selected
+        });
+        
+        setSelectedColumns(initialSelected);
       }
     } catch (error) {
       console.error("Error fetching columns:", error);
@@ -86,42 +99,46 @@ const HomePageWithoutLogin = () => {
   };
   
   const handleConfirmSelection = async (fileID) => {
-    if (selectedColumns.length === 0) {
-        alert("Please select at least one column!");
-        return;
+    // Check if any columns are selected
+    const hasSelectedColumns = Object.values(selectedColumns).some(
+      columnArray => columnArray && columnArray.length > 0
+    );
+    
+    if (!hasSelectedColumns) {
+      alert("Please select at least one column!");
+      return;
     }
+    
     setIsConfirmed(true);
 
     const selectedData = availableColumns
-        .map((table) => ({
-            table: table.table,
-            selectedColumns: selectedColumns[table.table] || [] // Fetch selected columns per table
-        }))
-        .filter(table => table.selectedColumns.length > 0);
+      .map((table) => ({
+        table: table.table,
+        selectedColumns: selectedColumns[table.table] || [] // Fetch selected columns per table
+      }))
+      .filter(table => table.selectedColumns.length > 0);
 
     console.log("Sending structured data:", selectedData);
 
     try {
-        const response = await axios.post(
-            `http://localhost:13889/paperless/exportToExcelFile/${fileID}`, 
-            { selectedData } // Wrapped in an object
-        );
+      const response = await axios.post(
+        `http://localhost:13889/paperless/exportToExcelFile/${fileID}`, 
+        { selectedData } // Wrapped in an object
+      );
 
-        if (response.status === 200) {
-            alert("Excel file created successfully!");
-        }
+      if (response.status === 200) {
+        alert("Excel file created successfully!");
+      }
     } catch (error) {
-        console.error("Error confirming selection:", error.response ? error.response.data : error.message);
-        alert("Failed to create Excel file.");
+      console.error("Error confirming selection:", error.response ? error.response.data : error.message);
+      alert("Failed to create Excel file.");
     }
-};
+  };
 
-  
-
-const handleDownload = async (file_ID) => {
-  try {
+  const handleDownload = async (file_ID) => {
+    try {
       const response = await axios.get(`http://localhost:13889/paperless/getExcelFileGuest/${file_ID}`, {
-          responseType: 'blob'  // Ensures file is downloaded as binary
+        responseType: 'blob'  // Ensures file is downloaded as binary
       });
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -136,49 +153,63 @@ const handleDownload = async (file_ID) => {
         window.location.reload();
       }, 2000); // refresh page
 
-  } catch (error) {
+    } catch (error) {
       console.error("Error downloading file:", error);
       alert("Failed to download Excel file.");
-  }
-};
+    }
+  };
 
+  // Toggle mobile menu
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
 
   return (
     <div className="container">
       <header>
-        <img src="/headerLogo.png" alt="Paperless Flow Logo" className="logo-activity" />
-        <nav className="nav-header">
+        <div className="header-left">
+          <img src="/headerLogo.png" alt="Paperless Flow Logo" className="logo-activity" />
+          {/* Hamburger menu next to logo */}
+          <div className="hamburger" onClick={toggleMenu}>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+        
+        <nav className={`nav-header ${menuOpen ? 'nav-open' : ''}`}>
           <p>
-            <button className="log-in" onClick={() => navigate(`/login`)}>
-              <a>Log in</a>
-            </button>
+            <a onClick={() => navigate(`/login`)}>Log in</a>
           </p>
           <p className="AboutUsLink"><a>About us</a></p>
-          <p className="UserLink"><a>Welcome!</a></p>
+          <p className="AllToolsLink"><a>All Tools</a></p>
+          <p className="UserLink"><a>Welcome, Guest!</a></p>
         </nav>
       </header>
 
       <div className="homepage-container">
         <h1 className='home-h1'>Documents To Excel</h1>
         <h2 className='home-h2'>Convert purchase orders, quotations, and receipts into Excel files quickly and easily</h2>
-        <input type="file" multiple onChange={handleFileChange} />
-        <button className='upload' onClick={handleUpload} disabled={processing}>
-          {processing ? "Processing..." : "Upload File"}
-        </button>
+        
+        <div className="upload-container">
+          <input type="file" multiple onChange={handleFileChange} />
+          <button className='upload' onClick={handleUpload} disabled={processing}>
+            {processing ? "Processing..." : "Upload File"}
+          </button>
+        </div>
 
-        {uploadProgress > 0 && (
-          <div style={{ marginTop: '1rem' }}>
+        {uploadProgress > 0 && uploadProgress < 100 && (
+          <div style={{ marginTop: '1rem', width: '80%', maxWidth: '500px', margin: '20px auto' }}>
             <progress value={uploadProgress} max="100" style={{ width: '100%' }} />
             <div>{uploadProgress}%</div>
           </div>
         )}
 
         {fileID && !isConfirmed && (
-          <div>
+          <div className="file-options">
             <p className='file-id'>Processed File ID: {fileID}</p>
-            <h3>File Type: {jsonData?.file_type}</h3>
-            <h3>Select columns to include in your Excel:</h3>
-            <p>This file with selected columns will be download only once here.</p> 
+            <h3>Select columns to include in your Excel</h3>
+            <p>Click on columns to select them (green = selected, white = not selected)</p> 
             
             <div className="column-selection-grid">
               {availableColumns.length > 0 ? (
@@ -203,7 +234,6 @@ const handleDownload = async (file_ID) => {
               )}
             </div>
 
-            
             <button
               className="btn-confirm"
               onClick={() => handleConfirmSelection(fileID)}
@@ -214,7 +244,7 @@ const handleDownload = async (file_ID) => {
         )}
 
         {isConfirmed && (
-          <div>
+          <div className="download-section">
             <p>Your selection has been confirmed!</p>
             <h3>You can download only once. Make sure to save it.</h3>
             <button
