@@ -143,6 +143,15 @@ const handleDownload = async (file_ID) => {
   }
 };
 
+const handleLogout = () => {
+  
+  localStorage.clear();
+  sessionStorage.clear();
+
+  navigate("/homepage");
+};
+
+
 
   return (
     <div className="container">
@@ -155,7 +164,13 @@ const handleDownload = async (file_ID) => {
             </button>
           </p>
           <p className="AboutUsLink"><a>About us</a></p>
+        
           <p className="UserLink"><a>Welcome, {username}!</a></p>
+          <p>
+            <button className="log-out" onClick={handleLogout}>
+              <a>Log out</a>
+            </button>
+          </p>
         </nav>
       </header>
 
@@ -180,7 +195,7 @@ const handleDownload = async (file_ID) => {
             <h3>File Type: {jsonData?.file_type}</h3>
             <h3>Select columns to include in your Excel:</h3>
             <p>This file with selected columns will be download only once here.</p> 
-            <p>If you download this file again in "your project" you will get all column.</p>
+            <p>If you download this file again, click Preview button in "your project".</p>
             
             <div className="column-selection-grid">
               {availableColumns.length > 0 ? (

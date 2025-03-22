@@ -149,6 +149,18 @@ input[type="file"] {
   cursor: not-allowed;
 }
 
+.log-out {
+  background-color: #ff4d4d;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.log-out:hover {
+  background-color: #e60000;
+}
 
 
 /* Column selection grid and buttons */

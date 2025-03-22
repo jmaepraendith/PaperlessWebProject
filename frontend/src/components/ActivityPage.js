@@ -130,6 +130,16 @@ const handlePreview = async (file_ID) => {
     setMenuOpen(!menuOpen);
   };
 
+  const handleLogout = () => {
+  
+    localStorage.clear();
+    sessionStorage.clear();
+  
+    navigate("/homepage");
+  };
+  
+  
+
   return (
     <div className="activity-container">
       <div className="three-dots">
@@ -157,7 +167,13 @@ const handlePreview = async (file_ID) => {
           </p>
           <p className="AboutUsLink"><a>About us</a></p>
           <p className="AllToolsLink"><a>All Tools</a></p>
+          
           <p className="UserLink"><a>Welcome, {username}!</a></p>
+          <p>
+            <button className="log-out" onClick={handleLogout}>
+              <a>Log out</a>
+            </button>
+          </p>
         </nav>
       </header>
 
