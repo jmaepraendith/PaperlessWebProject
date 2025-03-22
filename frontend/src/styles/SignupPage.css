@@ -445,3 +445,73 @@ label {
     transform: none;
     box-shadow: none;
   }
+  .pdpa-checkbox {
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    font-size: 0.5rem;
+}
+
+.pdpa-front{
+    font-size: 1rem;
+}
+
+.pdpa-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 400;
+    color: #333;
+}
+
+.pdpa-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #005f43; /* สีเดียวกับปุ่ม Sign Up */
+    cursor: pointer;
+}
+
+.pdpa-label a {
+    color: #005f43;
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+.input-error {
+    color: #d32f2f;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+.tooltip {
+    position: relative;
+    cursor: pointer;
+    color: #005f43;
+    text-decoration: underline;
+    font-weight: 500;
+  }
+  
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 260px;
+    background-color: #f9f9f9;
+    color: #333;
+    text-align: left;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Show above the text */
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.85rem;
+  }
+  
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+  

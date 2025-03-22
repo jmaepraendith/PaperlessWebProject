@@ -11,6 +11,8 @@ const SignupPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [formErrors, setFormErrors] = useState({});
     const navigate = useNavigate();
+    const [pdpaAccepted, setPdpaAccepted] = useState(false);
+
     
     useEffect(() => {
         const container = document.querySelector('.signup-container');
@@ -42,6 +44,10 @@ const SignupPage = () => {
         
         if (password !== confirmPassword) {
             errors.confirmPassword = 'Passwords do not match';
+        }
+
+        if (!pdpaAccepted) {
+            errors.pdpa = 'You must accept the PDPA policy to continue';
         }
         
         setFormErrors(errors);
@@ -99,7 +105,7 @@ const SignupPage = () => {
                 <div className="signup-left-content">
                     <h2>Welcome to Paperless Flow</h2>
                     <p>
-                        Simplify your accounting with AI-powered automation. Effortlessly extract data from receipts and invoices, minimize errors, and manage documents securely—all in one platform.
+                        Simplify your accounting with AI-powered automation. Effortlessly extract data from receipts, purchase orders and invoices, minimize errors, and manage documents securely—all in one platform.
                     </p>
                     
 
@@ -182,6 +188,33 @@ const SignupPage = () => {
                     >
                         {isLoading ? 'Processing...' : 'Sign Up'}
                     </button>
+
+                    <div className="form-group pdpa-checkbox">
+                        <label htmlFor="pdpa" className="pdpa-label">
+                            <input
+                                type="checkbox"
+                                id="pdpa"
+                                checked={pdpaAccepted}
+                                onChange={(e) => setPdpaAccepted(e.target.checked)}
+                                disabled={isLoading}
+                            />
+                            <span className="pdpa-front">
+                                I have read and accept the{' '}
+                                <span className="tooltip">
+                                    PDPA policy
+                                    <span className="tooltiptext">
+                                        We value your privacy. By signing up, you consent to the collection and use of your personal data in accordance with our PDPA policy. Your filea will be used to train LLM model.
+                                    </span>
+                                </span>.
+                            </span>
+                        </label>
+                        {!pdpaAccepted && formErrors.pdpa && (
+                            <div className="input-error">{formErrors.pdpa}</div>
+                        )}
+                    </div>
+
+
+
                 </form>
                 <p>
                     Already have an account? <a href="/login">Login</a>
