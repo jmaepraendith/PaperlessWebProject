@@ -5,18 +5,19 @@ import SignupPage from './components/SignupPage';
 import HomePage from './components/HomePage';
 import ResetPasswordPage from './components/ResetPasswordPage';
 import ActivityPage from './components/ActivityPage';
+import HomePageWithoutLogin from './components/HomePageWithoutLogin';
 
 const App = () => {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<LoginPage />} />
+                <Route path="/" element={<HomePageWithoutLogin />} />
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/homepage/:username" element={<HomePage />} />
                 <Route path="/resetpassword" element={<ResetPasswordPage />} />
                 <Route path="/activity/:username" element={<ActivityPage />} />
-                
+                <Route path="/homepage" element={<HomePageWithoutLogin/>} />
             </Routes>
         </Router>
     );

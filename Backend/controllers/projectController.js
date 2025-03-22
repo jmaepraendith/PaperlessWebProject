@@ -482,3 +482,55 @@ exports.deleteRecordsbyfileID = async (req, res) => {
 };
 
 
+
+exports.getExcelFileGuest = async (req, res) => {
+    try {
+        const { file_ID } = req.params;
+
+        if (!file_ID) {
+            return res.status(400).json({ message: "File ID is required." });
+        }
+
+        const filePath = path.join(__dirname, '../../exports', `Project_${file_ID}.xlsx`);
+
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({ message: "Excel file not found." });
+        }
+
+        res.download(filePath, `Project_${file_ID}.xlsx`, async (err) => {
+            if (err) {
+                console.error("Error sending file:", err);
+                return res.status(500).json({ message: "Failed to download Excel file." });
+            }
+
+            console.log(`File sent for download: ${filePath}`);
+
+            // after successful download
+            // Delete the file after successful download
+            fs.unlinkSync(filePath);
+            console.log("File deleted from local exports folder:", filePath);
+    
+            const billCount = await Bill.count({ where: { file_ID } });
+            if (billCount > 0) {
+                await Bill.destroy({ where: { file_ID } });
+            }
+    
+            const invoiceCount = await Invoice.count({ where: { file_ID } });
+            if (invoiceCount > 0) {
+                await Invoice.destroy({ where: { file_ID } });
+            }
+    
+            const purchaseOrderCount = await PurchaseOrder.count({ where: { file_ID } });
+            if (purchaseOrderCount > 0) {
+                await PurchaseOrder.destroy({ where: { file_ID } });
+            }
+    
+            await Project.destroy({ where: { file_ID } });
+        });
+
+    } catch (error) {
+        console.error("Error retrieving Excel file:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+

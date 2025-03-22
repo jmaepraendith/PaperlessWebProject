@@ -17,6 +17,7 @@ router.post('/verify-code', userController.verifyCodeAndUpdatePassword);
 router.delete('/deleteProject/:file_ID', projectController.deleteRecordsbyfileID);
 router.post('/exportToExcelFile/:file_ID', projectController.exportToExcelFile);
 router.get('/getExcelFile/:file_ID', projectController.getExcelFile);
+router.get('/getExcelFileGuest/:file_ID', projectController.getExcelFileGuest);
 router.get('/getExcelFileallcolumn/:file_ID', projectController.allcolumnExcelFile);
 router.get('/getFileLinkfromDrive/:file_ID', projectController.getFileLinkfromDrive);
 

@@ -132,6 +132,11 @@ const handleDownload = async (file_ID) => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000); // refresh page
+
   } catch (error) {
       console.error("Error downloading file:", error);
       alert("Failed to download Excel file.");
@@ -213,6 +218,7 @@ const handleDownload = async (file_ID) => {
         {isConfirmed && (
           <div>
             <p>Your selection has been confirmed!</p>
+            <h3>You can download only once. Make sure to save it.</h3>
             <button
               className="btn-download"
               onClick={() => handleDownload(fileID)}
