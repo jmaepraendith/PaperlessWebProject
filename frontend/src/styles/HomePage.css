@@ -204,10 +204,7 @@ progress::-webkit-progress-value {
 /* File options section */
 .file-options {
   margin-top: 30px;
-  background: #f9f9f9;
   padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
 }
 
 .download-section {
@@ -217,6 +214,10 @@ progress::-webkit-progress-value {
   border-radius: 10px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
   border: 1px solid #004838;
+  max-width: 600px;     
+  width: 80%;          
+  margin-left: auto;   
+  margin-right: auto;  
 }
 
 /* Column selection styling - updated for better centering */

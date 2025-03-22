@@ -194,9 +194,7 @@ const HomePage = () => {
           <p className="AllToolsLink"><a>All Tools</a></p>
           <p className="UserLink"><a>Welcome, {username}!</a></p>
           <p>
-            <button className="log-out" onClick={handleLogout}>
-              <a>Log out</a>
-            </button>
+            <a onClick={() => {navigate(`/log-out`); handleLogout(); }}>Log out</a>
           </p>
         </nav>
       </header>
