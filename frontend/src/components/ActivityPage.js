@@ -156,17 +156,11 @@ const ActivityPage = () => {
   
   const handleChangePassword = () => {
     // Add your change password logic here
-    navigate("/change-password"); // Adjust this to your actual route
+    navigate("/changepassword"); // Adjust this to your actual route
   };
 
   return (
     <div className="activity-container">
-      <div className="three-dots">
-        <div className="dot"></div>
-        <div className="dot"></div>
-        <div className="dot"></div>
-      </div>
-      
       <header>
         <div className="header-left">
           <img src="/headerLogo.png" alt="Paperless Flow Logo" className="logo-activity" />

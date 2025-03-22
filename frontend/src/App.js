@@ -6,6 +6,7 @@ import HomePage from './components/HomePage';
 import ResetPasswordPage from './components/ResetPasswordPage';
 import ActivityPage from './components/ActivityPage';
 import HomePageWithoutLogin from './components/HomePageWithoutLogin';
+import ChangePasswordPage from './components/ChangePasswordPage';
 
 const App = () => {
     return (
@@ -18,6 +19,7 @@ const App = () => {
                 <Route path="/resetpassword" element={<ResetPasswordPage />} />
                 <Route path="/activity/:username" element={<ActivityPage />} />
                 <Route path="/homepage" element={<HomePageWithoutLogin/>} />
+                <Route path="/changepassword" element={<ChangePasswordPage/>} />
             </Routes>
         </Router>
     );

@@ -170,7 +170,7 @@ const HomePage = () => {
 
   const handleChangePassword = () => {
     // นำทางไปยังหน้าเปลี่ยนรหัสผ่าน
-    navigate("/change-password");
+    navigate("/changepassword");
   };
 
   // Toggle mobile menu
