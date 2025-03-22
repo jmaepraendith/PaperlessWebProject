@@ -82,13 +82,14 @@ header {
 
 /* Homepage container */
 .homepage-container {
-  margin-top: 120px;
+  /* margin-top: 100px; */
   padding: 20px 40px;
   text-align: center;
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
 }
+
 
 /* File input and buttons */
 .upload-container {
@@ -447,5 +448,68 @@ progress::-webkit-progress-value {
   .nav-header a, 
   .nav-header button {
     font-size: 14px;
+  }
+}
+
+
+
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.scrolling-banner-container {
+  margin-top: 85px; /* match header height */
+  z-index: 999;
+}
+
+.scrolling-banner {
+  width: 100%;
+  background-color: #004838;
+  color: white;
+  overflow: hidden;
+  padding: 16px 0;
+  white-space: nowrap;
+  position: relative;
+}
+
+.marquee-content {
+  display: inline-block;
+  white-space: nowrap;
+  animation: marquee 15s linear infinite;
+}
+
+.marquee-text {
+  font-size: 20px;
+  font-weight: bold;
+  padding: 0 32px;
+  display: inline-block;
+}
+
+
+.bg {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-size: 300% 300%;
+  background-image: linear-gradient(-45deg, rgb(200, 255, 205) 0%, rgb(179, 255, 235) 25%, rgb(193, 255, 168) 51%, #9affc6 100%);
+  animation: AnimateBG 20s ease infinite;
+}
+
+@keyframes AnimateBG {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
   }
 }

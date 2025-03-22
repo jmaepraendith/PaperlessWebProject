@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import "../styles/HomePage.css";
+import ScrollingBanner from '../styles/ScrollingBanner';
+
 
 const HomePageWithoutLogin = () => {
   const [files, setFiles] = useState([]);
@@ -165,7 +167,7 @@ const HomePageWithoutLogin = () => {
   };
 
   return (
-    <div className="container">
+    <div className="bg">
       <header>
         <div className="header-left">
           <img src="/headerLogo.png" alt="Paperless Flow Logo" className="logo-activity" />
@@ -187,9 +189,14 @@ const HomePageWithoutLogin = () => {
         </nav>
       </header>
 
+      <div className="scrolling-banner-container">
+        <ScrollingBanner />
+      </div>
+
+
       <div className="homepage-container">
         <h1 className='home-h1'>Documents To Excel</h1>
-        <h2 className='home-h2'>Convert purchase orders, quotations, and receipts into Excel files quickly and easily</h2>
+        <h2 className='home-h2'>Convert purchase orders, invoices, receipts and bills into Excel files quickly and easily</h2>
         
         <div className="upload-container">
           <input type="file" multiple onChange={handleFileChange} />

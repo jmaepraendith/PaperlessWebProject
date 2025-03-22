@@ -238,6 +238,7 @@ const ActivityPage = () => {
         )}
       </main>
     </div>
+    
   );
 };
 
