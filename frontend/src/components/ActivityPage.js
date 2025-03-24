@@ -178,8 +178,7 @@ const ActivityPage = () => {
               <a>Home</a>
             </button>
           </p>
-          <p className="AboutUsLink"><a>About us</a></p>
-          <p className="AllToolsLink"><a>All Tools</a></p>
+          
           
           <div className="user-dropdown-container">
             <p className="UserLink" onClick={toggleUserDropdown}>

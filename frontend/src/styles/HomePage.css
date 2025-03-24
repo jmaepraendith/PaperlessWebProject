@@ -498,7 +498,12 @@ progress::-webkit-progress-value {
   display: flex;
   flex-direction: column;
   background-size: 300% 300%;
-  background-image: linear-gradient(-45deg, rgb(200, 255, 205) 0%, rgb(179, 255, 235) 25%, rgb(193, 255, 168) 51%, #9affc6 100%);
+  background-image: linear-gradient(-45deg,  
+    #ECEFEA 0%,   /* เทาอ่อนอมขาว */  
+    #DDE3DD 25%,  /* เทาอมเขียวพาสเทล */  
+    #C8D4C8 51%,  /* เขียวหม่นเทา */  
+    #DDEAE2 100%  /* เทาอมเขียวอ่อนสุด ๆ */  
+  );
   animation: AnimateBG 20s ease infinite;
 }
 

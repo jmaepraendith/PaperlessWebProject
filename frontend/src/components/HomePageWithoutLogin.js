@@ -183,8 +183,6 @@ const HomePageWithoutLogin = () => {
           <p>
             <a onClick={() => navigate(`/login`)}>Log in</a>
           </p>
-          <p className="AboutUsLink"><a>About us</a></p>
-          <p className="AllToolsLink"><a>All Tools</a></p>
           <p className="UserLink"><a>Welcome, Guest!</a></p>
         </nav>
       </header>
