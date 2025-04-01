@@ -3,7 +3,7 @@ actor Accountant
 participant LoginPage
 participant userController
 participant ResetPasswordPage
-database User
+database Database
 
 
 Accountant -> LoginPage : Fill in Username and Password
@@ -14,8 +14,8 @@ LoginPage -> Accountant : Show alert "All fields are required"
 Accountant -> LoginPage : click log in button
 LoginPage -> userController : Submit login(username, password)
 
-userController -> User : findOne({ where: { username } })
-User --> userController : return user or null
+userController -> Database : findOne({ where: { username } })
+Database --> userController : return user or null
 
 userController -> userController : bcrypt.compare(password, user.password)
 userController -> LoginPage : return 200 "Login success" or return 401 "Invalid password"
@@ -29,8 +29,8 @@ LoginPage -> ResetPasswordPage : Redirect to Reset Password Page
 
 Accountant -> ResetPasswordPage : Fill in Username
 ResetPasswordPage -> userController : find email by username
-userController -> User : findOne({ where: { username } })
-User --> userController : Return user with email
+userController -> Database : findOne({ where: { username } })
+Database --> userController : Return user with email
 
 userController -> userController : Generate Verification Code
 Accountant -> ResetPasswordPage : Click "Send Code"
@@ -46,8 +46,8 @@ Accountant -> ResetPasswordPage : Fill new password + confirm password
 
 ResetPasswordPage -> Accountant : Show error "Passwords do not match"
 userController -> userController : Hash new password
-userController -> User : update password in DB
-User --> userController : Update success
+userController -> Database : update password in DB
+Database --> userController : Update success
 ResetPasswordPage -> Accountant : Redirect to log in Page
 
 
