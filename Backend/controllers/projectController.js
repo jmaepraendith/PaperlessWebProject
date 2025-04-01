@@ -49,7 +49,6 @@ exports.allcolumnExcelFile = async (req, res) => {
         // Add only tables that have data
         tablesWithData.forEach(table => addSheet(workbook, table.name, table.data));
 
-        // Set response headers
         res.setHeader(
             "Content-Type",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -102,8 +101,8 @@ exports.getAllProject = async (req, res) => {
             where: { username },
             attributes: ['file_ID', 'file_name', 'create_date', 'update_date', 'username'],
             order: [
-                ['update_date', 'DESC'],  // Sort by update_date first
-                ['create_date', 'DESC']   // If update_date is null, sort by create_date
+                ['update_date', 'DESC'],  
+                ['create_date', 'DESC']   
             ]
         });
 
@@ -123,7 +122,7 @@ exports.getAllProject = async (req, res) => {
         // Map through projects and modify file_name if it's null
         const formattedProjects = projects.map(project => ({
             file_ID: project.file_ID,
-            file_name: project.file_name ? project.file_name : project.file_ID, // Use file_ID if file_name is null
+            file_name: project.file_name ? project.file_name : project.file_ID, 
             date: project.update_date ? formatDate(project.update_date) : formatDate(project.create_date),
             create_date: project.create_date,
             update_date: project.update_date,
@@ -163,13 +162,11 @@ exports.getColumnEachTable = async (req, res) => {
     try {
         const { file_ID } = req.params;
 
-        // Check if file_ID exists in the Project table
         const project = await Project.findOne({ where: { file_ID } });
         if (!project) {
             return res.status(404).json({ message: "Project not found" });
         }
 
-        // Check which tables contain the file_ID
         const billExists = await Bill.findOne({ where: { file_ID } });
         const invoiceExists = await Invoice.findOne({ where: { file_ID } });
         const purchaseOrderExists = await PurchaseOrder.findOne({ where: { file_ID } });
@@ -179,7 +176,6 @@ exports.getColumnEachTable = async (req, res) => {
         if (invoiceExists) tablesWithfile_ID.push("Invoice");
         if (purchaseOrderExists) tablesWithfile_ID.push("PurchaseOrder");
 
-        // Fetch columns dynamically for each identified table
         const ColumnEachTable = await Promise.all(
             tablesWithfile_ID.map(async (tableName) => {
                 const tableColumns = await sequelize.getQueryInterface().describeTable(tableName);
@@ -209,8 +205,7 @@ exports.exportToExcelFile = async (req, res) => {
             return res.status(400).json({ message: "No columns selected for export" });
         }
 
-        // Validate project exists
-        const project = await Project.findOne({ where: { file_ID } }); // Ensure consistency
+        const project = await Project.findOne({ where: { file_ID } }); 
         if (!project) {
             return res.status(404).json({ message: "Project not found" });
         }
@@ -276,7 +271,6 @@ exports.exportToExcelFile = async (req, res) => {
 
         console.log(`Excel file saved at: ${filePath}`);
 
-        // Send success response
         res.status(200).json({ message: "Excel file created successfully!", filePath });
 
     } catch (error) {
@@ -370,7 +364,6 @@ const uploadToGoogleDrive = async (filePath) => {
             fields: 'id',
         });
 
-        // Set file access to "Anyone with the link can view"
         await drive.permissions.create({
             fileId: file.data.id,
             requestBody: {
@@ -407,7 +400,6 @@ exports.getFileLinkfromDrive = async (req, res) => {
         const authClient = await authorize();
         const drive = google.drive({ version: 'v3', auth: authClient });
 
-        // Search for the file by name
         const fileName = `Project_${file_ID}.xlsx`;
         const response = await drive.files.list({
             q: `name='${fileName}' and trashed=false`,

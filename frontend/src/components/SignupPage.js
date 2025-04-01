@@ -42,7 +42,9 @@ const SignupPage = () => {
             errors.password = 'Password must be at least 6 characters';
         }
         
-        if (password !== confirmPassword) {
+        if (!confirmPassword.trim()) {
+            errors.confirmPassword = 'confirmPassword is required';
+        } else if (password !== confirmPassword) {
             errors.confirmPassword = 'Passwords do not match';
         }
 

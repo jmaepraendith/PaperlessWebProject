@@ -1,0 +1,106 @@
+@startuml PaperlessWebProject
+!define MODEL(x) class x <<Model>>
+!define CONTROLLER(x) class x <<Controller>>
+!define SERVICE(x) class x <<Service>>
+
+package "models" {
+    MODEL(User) {
+        + username: String
+        + password: String
+        + email: String
+    }
+
+    MODEL(Project) {
+        + file_ID: String
+        + create_date: Date
+        + update_date: Date
+        + file_name: String
+        + username: String
+    }
+
+    MODEL(Invoice) {
+    + index_file: int
+    + file_ID: String
+    + file_type: String
+    + fileimagename: String
+    + invoice_number: String
+    + invoice_date: Date
+    + seller_name: String
+    + buyer_name: String
+    + product_item: String
+    + description: Text
+    + quantity: int
+    + unit_price: Decimal(10,2)
+    + total_product_price: Decimal(10,2)
+    + all_total_before_tax: Decimal(10,2)
+    + vat: Decimal(10,2)
+    + all_total_amount_including_VAT: Decimal(10,2)
+    + payment_terms: String
+    + payment_method: String
+}
+
+
+    MODEL(Bill) {
+    + index_file: int
+    + file_ID: String
+    + file_type: String
+    + fileimagename: String
+    + receipt_number: String
+    + receipt_date: Date
+    + payment_description: Text
+    + payer_name: String
+    + payment_method: Enum('Cash', 'Credit', 'Transfer')
+    + product_item: String
+    + description: Text
+    + quantity: int
+    + unit_price: Decimal(10,2)
+    + total_product_price: Decimal(10,2)
+    + all_product_total_price: Decimal(10,2)
+    + amount_paid: Decimal(10,2)
+}
+
+
+    MODEL(PurchaseOrder) {
+    + index_file: int
+    + file_ID: String
+    + file_type: String
+    + fileimagename: String
+    + purchase_order_number: String
+    + order_date: Date
+    + customer_name: String
+    + product_item: String
+    + description: Text
+    + quantity: int
+    + unit_price: Decimal(10,2)
+    + total_product_price: Decimal(10,2)
+    + all_product_total_price: Decimal(10,2)
+    + supplier_name: String
+    + order_status: Enum('Pending','Shipped','Completed')
+    + delivery_date: Date
+}
+
+}
+
+package "controllers" {
+    CONTROLLER(userController)
+    CONTROLLER(projectController)
+    CONTROLLER(ocrController)
+}
+
+
+User "1" --> "0..*" Project : owns
+Project "1" --> "0..*" Invoice
+Project "1" --> "0..*" Bill
+Project "1" --> "0..*" PurchaseOrder
+
+userController --> User
+projectController --> Project
+projectController --> Invoice
+projectController --> Bill
+projectController --> PurchaseOrder
+ocrController --> Project
+ocrController --> Bill
+ocrController --> Invoice
+ocrController --> PurchaseOrder
+
+@enduml

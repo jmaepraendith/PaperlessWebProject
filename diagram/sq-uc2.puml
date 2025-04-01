@@ -1,0 +1,55 @@
+@startuml
+actor Accountant
+participant LoginPage
+participant userController
+participant ResetPasswordPage
+database User
+
+
+Accountant -> LoginPage : Fill in Username and Password
+LoginPage -> LoginPage : Check if username/password is null
+LoginPage -> Accountant : Show alert "All fields are required"
+
+
+Accountant -> LoginPage : click log in button
+LoginPage -> userController : Submit login(username, password)
+
+userController -> User : findOne({ where: { username } })
+User --> userController : return user or null
+
+userController -> userController : bcrypt.compare(password, user.password)
+userController -> LoginPage : return 200 "Login success" or return 401 "Invalid password"
+    
+LoginPage -> Accountant : Redirect to Home Page 
+    
+
+== Reset Password Flow ==
+Accountant -> LoginPage : Click "Forgot Password"
+LoginPage -> ResetPasswordPage : Redirect to Reset Password Page
+
+Accountant -> ResetPasswordPage : Fill in Username
+ResetPasswordPage -> userController : find email by username
+userController -> User : findOne({ where: { username } })
+User --> userController : Return user with email
+
+userController -> userController : Generate Verification Code
+Accountant -> ResetPasswordPage : Click "Send Code"
+userController -> EmailService : Send email with code
+EmailService --> Accountant : Email sent
+ResetPasswordPage -> Accountant : Show code input field
+
+Accountant -> ResetPasswordPage : Enter verification code
+ResetPasswordPage -> userController : Verify code
+userController -> Accountant : Show "Code invalid"
+userController -> ResetPasswordPage : Show new password fields
+Accountant -> ResetPasswordPage : Fill new password + confirm password
+
+ResetPasswordPage -> Accountant : Show error "Passwords do not match"
+userController -> userController : Hash new password
+userController -> User : update password in DB
+User --> userController : Update success
+ResetPasswordPage -> Accountant : Redirect to log in Page
+
+
+
+@enduml

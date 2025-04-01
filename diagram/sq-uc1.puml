@@ -1,0 +1,34 @@
+@startuml
+actor Accountant
+participant Homepage
+participant RegisterPage
+participant userController
+database User
+
+Accountant -> Homepage : Click "Register" Button
+Homepage -> RegisterPage : Redirect to Register Page
+
+Accountant -> RegisterPage : Fill in Username,\nPassword, Confirm Password, Email\nAccept PDPA
+RegisterPage -> RegisterPage : ValidateForm()
+RegisterPage -> userController : Check username exists
+userController -> User : findOne({ where: { username } })
+userController --> RegisterPage : Username already exists
+
+RegisterPage -> RegisterPage : Check password length
+RegisterPage -> RegisterPage : Check confirmPassword match
+RegisterPage -> RegisterPage : CheckEmailPattern()
+
+RegisterPage -> Accountant : Show 'You must accept PDPA'
+
+RegisterPage -> userController : Send valid form
+userController -> userController : Hash password
+userController -> User : create({ username, email, password })
+User --> userController : newUser
+userController --> RegisterPage : Registration success
+RegisterPage -> Accountant : Show success message
+
+
+
+@enduml
+
+<!-- https://www.plantuml.com/plantuml/uml -->

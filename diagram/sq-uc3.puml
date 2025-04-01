@@ -1,0 +1,47 @@
+@startuml
+actor Accountant
+participant HomePage
+participant ActivityPage
+participant projectController
+database Database
+participant GoogleDrive
+participant GoogleSheetService
+
+== Load Projects ==
+Accountant -> HomePage : Click "Your Projects"
+HomePage -> ActivityPage : Redirect to activity page
+ActivityPage -> projectController : GET /getAllProject(username)
+projectController -> Database : Find Projects where username
+Database --> projectController : List of Projects
+projectController --> ActivityPage : Return Project Data
+ActivityPage -> Accountant : Show project list
+
+== Preview File ==
+Accountant -> ActivityPage : Select project
+Accountant -> ActivityPage : Click "Preview"
+ActivityPage -> GoogleDrive : Open Excel File by file_ID
+GoogleDrive -> Accountant : View File
+
+Accountant -> GoogleDrive : Click "Open in Google Sheets"
+GoogleDrive -> GoogleSheetService : Open file in editable mode
+Accountant -> GoogleSheetService : Edit + Save file
+
+== Download File ==
+Accountant -> ActivityPage : Click "Download All Columns"
+ActivityPage -> projectController : Request Excel Export (all columns)
+projectController -> Database : Fetch all related data (Bill, Invoice, PO)
+Database --> projectController : Data
+projectController -> projectController : Generate Excel
+projectController --> ActivityPage : Send Excel File
+ActivityPage -> Accountant : Save/Open Excel File
+
+== Delete Project ==
+Accountant -> ActivityPage : Click "Delete"
+ActivityPage -> Accountant : Show confirm dialog
+Accountant -> ActivityPage : Confirm deletion
+ActivityPage -> projectController : DELETE /project/:file_ID
+projectController -> Database : Delete Bill/Invoice/PO/Project by file_ID
+Database --> projectController : Deleted
+projectController --> ActivityPage : Success Message
+ActivityPage -> Accountant : Show "Project deleted successfully"
+@enduml

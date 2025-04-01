@@ -8,13 +8,12 @@ const Bill = require('../models/Bill');
 const Invoice = require('../models/Invoice');
 const PurchaseOrder = require('../models/PurchaseOrder');
 
-// Configure multer to store files temporarily
+// store files temporarily
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'temp_uploads/'); // Ensure this folder exists
+    cb(null, 'temp_uploads/'); // this folder have to exists
   },
   filename: (req, file, cb) => {
-    // Example naming: username-originalFilename
     cb(null, req.body.username + '-' + file.originalname);
   }
 });
@@ -27,7 +26,7 @@ function extractJsonObjects(ocrResults) {
   if (typeof ocrResults === "string") {
     dataStr = ocrResults;
   }
-  // If it's an array (each element with a "formatted_data" field), combine them.
+  // If it's an array (each element with a "formatted_data" field), combine.
   else if (Array.isArray(ocrResults)) {
     dataStr = ocrResults.map(item => item.formatted_data).join("\n");
   }
@@ -78,10 +77,10 @@ exports.processFiles = [
   upload.array('files'),
   async (req, res) => {
     try {
-      // 1) Generate a new file_ID (UUID) for this entire batch
+      
       const file_ID = uuidv4();
 
-      // 2) Create a Project record so we can link each line item to this batch
+      // Create a Project 
       const projectData = {
         file_ID,
         username: req.body.username,
@@ -90,7 +89,7 @@ exports.processFiles = [
       };
       await Project.create(projectData);
 
-      // 3) Forward files to Python OCR service using a stream for each file
+      // Forward files to Python OCR service 
       const formData = new FormData();
       req.files.forEach(file => {
         formData.append('files', fs.createReadStream(file.path));
@@ -101,7 +100,7 @@ exports.processFiles = [
         headers: formData.getHeaders(),
       });
 
-      // 4) The OCR service returns a JSON with extracted OCR results.
+      // The OCR service returns a JSON
       const rawocrResults = response.data;
       let ocrResults = extractJsonObjects(rawocrResults);
       console.log("Extracted OCR Results:", ocrResults);
@@ -109,7 +108,7 @@ exports.processFiles = [
       // Flatten the result in case it's nested
       ocrResults = Array.isArray(ocrResults[0]) ? ocrResults.flat() : ocrResults;
 
-      // 5) Process each extracted JSON object based on its file_type
+      // Process each extracted JSON object based on its file_type
       for (const lineItem of ocrResults) {
         if (lineItem.file_type === 'Bill') {
           await Bill.create({
@@ -172,12 +171,11 @@ exports.processFiles = [
         }
       }
 
-      // 6) Cleanup temp files
+      // Clean files
       req.files.forEach(file => {
         fs.unlinkSync(file.path);
       });
 
-      // 7) Respond to the client with success
       res.status(200).json({
         message: "Files processed and data stored successfully.",
         file_ID,

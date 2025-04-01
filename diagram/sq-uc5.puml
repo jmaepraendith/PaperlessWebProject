@@ -1,0 +1,32 @@
+@startuml
+actor Accountant
+participant HomePage
+participant projectController
+database Database
+participant GoogleDrive
+
+== Log in User ==
+Accountant -> HomePage : Click "Download File"
+HomePage -> projectController : GET /getExcelFile/:file_ID
+
+projectController -> Database : Fetch data (Bill, Invoice, PO)
+Database --> projectController : Return data
+projectController -> projectController : Generate Excel file
+projectController --> HomePage : Download Excel file
+HomePage -> Accountant : Save file to device
+projectController -> GoogleDrive : Upload Excel file
+GoogleDrive --> projectController : Upload successfully 
+
+== Guest ==
+Accountant -> HomePage : Click "Download File"
+HomePage -> projectController : GET /getExcelFileGuest/:file_ID
+
+projectController -> Database : Fetch data by file_ID
+Database --> projectController : Return data
+projectController -> projectController : Generate Excel file
+projectController --> HomePage : Download Excel file
+HomePage -> Accountant : Save file to device
+
+projectController -> Database : DELETE Bill/Invoice/PO/Project
+Database --> projectController : Deletion complete
+@enduml

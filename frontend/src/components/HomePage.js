@@ -24,7 +24,6 @@ const HomePage = () => {
     setUploadProgress(0);
   };
 
-  // Handle file upload
   const handleUpload = async () => {
     if (files.length === 0) {
       alert("Please select at least one file!");
@@ -38,7 +37,7 @@ const HomePage = () => {
     formData.append('username', username);
 
     try {
-      // Add upload progress monitoring
+
       const response = await axios.post('http://localhost:13889/paperless/process', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (progressEvent) => {
@@ -64,20 +63,18 @@ const HomePage = () => {
   };
 
   
-  // Fetch available columns from the backend
+  // Fetch columns from the backend
   const fetchColumns = async (file_ID) => {
     try {
       const response = await axios.get(`http://localhost:13889/paperless/get-column-each-table/${file_ID}`);
       console.log("Columns received:", response.data);
 
       if (response.data.length > 0) {
-        setAvailableColumns(response.data); // Store the entire table & column structure
+        setAvailableColumns(response.data); 
         
-        // Initialize selected columns structure
-        // Changed the default behavior - now no columns are selected by default
         const initialSelected = {};
         response.data.forEach(table => {
-          initialSelected[table.table] = []; // Start with no columns selected
+          initialSelected[table.table] = []; 
         });
         
         setSelectedColumns(initialSelected);
@@ -88,7 +85,7 @@ const HomePage = () => {
     }
   };
 
-  // Handle column selection toggle
+  // for column selection 
   const toggleColumnSelection = (tableName, column) => {
     setSelectedColumns(prev => {
       const updatedTableColumns = prev[tableName] || [];
@@ -118,7 +115,7 @@ const HomePage = () => {
     const selectedData = availableColumns
       .map((table) => ({
         table: table.table,
-        selectedColumns: selectedColumns[table.table] || [] // Fetch selected columns per table
+        selectedColumns: selectedColumns[table.table] || [] 
       }))
       .filter(table => table.selectedColumns.length > 0);
 
@@ -127,7 +124,7 @@ const HomePage = () => {
     try {
       const response = await axios.post(
         `http://localhost:13889/paperless/exportToExcelFile/${fileID}`, 
-        { selectedData } // Wrapped in an object
+        { selectedData } 
       );
 
       if (response.status === 200) {
@@ -155,7 +152,7 @@ const HomePage = () => {
 
       setTimeout(() => {
         window.location.reload();
-      }, 2000); // refresh page
+      }, 2000); 
 
     } catch (error) {
       console.error("Error downloading file:", error);
@@ -170,22 +167,18 @@ const HomePage = () => {
   };
 
   const handleChangePassword = () => {
-    // นำทางไปยังหน้าเปลี่ยนรหัสผ่าน
     navigate("/changepassword");
   };
 
-  // Toggle mobile menu
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
 
-  // Toggle user dropdown
   const toggleUserDropdown = (e) => {
-    e.stopPropagation(); // Prevent event bubbling
+    e.stopPropagation(); 
     setUserDropdownOpen(!userDropdownOpen);
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const closeDropdown = (e) => {
       if (userDropdownOpen && !e.target.closest('.user-menu-container')) {
@@ -202,7 +195,7 @@ const HomePage = () => {
       <header>
         <div className="header-left">
           <img src="/headerLogo.png" alt="Paperless Flow Logo" className="logo-activity" />
-          {/* Hamburger menu next to logo */}
+        
           <div className="hamburger" onClick={toggleMenu}>
             <span></span>
             <span></span>
@@ -298,7 +291,8 @@ const HomePage = () => {
         {isConfirmed && (
           <div className="download-section">
             <p>Your selection has been confirmed!</p>
-            <h3>You can download only once. Make sure to save it.</h3>
+            <h3>You can download this file again in your projects.</h3>
+            <h3>Be sure to click download here first.</h3>
             <button
               className="btn-download"
               onClick={() => handleDownload(fileID)}

@@ -9,32 +9,27 @@ exports.signup = async (req, res) => {
 
     const { email, username, password } = req.body;
 
-    // Validate input fields
     if (!email || !username || !password) {
         console.log('Validation failed: All fields are required.');
         return res.status(400).json({ error: 'All fields are required.' });
     }
 
     try {
-        // Check if the username already exists
         const existingUser = await User.findOne({ where: { username } });
         if (existingUser) {
             console.log('Existing username:', username);
             return res.status(400).json({ error: 'Username already exists.' });
         }
 
-        // Check if the email already exists
         const existingEmail = await User.findOne({ where: { email } });
         if (existingEmail) {
             console.log('Existing email:', email);
             return res.status(400).json({ error: 'Email already exists.' });
         }
 
-        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
         console.log('Password hashed successfully:', hashedPassword);
 
-        // Create the new user
         const newUser = await User.create({
             email,
             username,
@@ -45,10 +40,8 @@ exports.signup = async (req, res) => {
         return res.status(201).json({ message: 'User registered successfully', user: newUser });
 
     } catch (error) {
-        // for debugging
         console.error('Signup error:', error);
 
-        // Return appropriate error response
         if (error.name === 'SequelizeUniqueConstraintError') {
             return res.status(400).json({ error: 'Username or email must be unique.' });
         }
@@ -63,13 +56,11 @@ exports.login = async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        // Find user by username
         const user = await User.findOne({ where: { username } });
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        // Compare passwords
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             return res.status(401).json({ error: 'Invalid password' });
@@ -87,7 +78,6 @@ exports.login = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
     try {
-        // Fetch all users from the database
         const users = await User.findAll();
         
         if (users) {
@@ -159,13 +149,10 @@ exports.verifyCodeAndUpdatePassword = async (req, res) => {
             return res.status(400).json({ error: 'Invalid or expired verification code' });
         }
 
-        // Hash the new password
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-        // Update user's password
         await User.update({ password: hashedPassword }, { where: { username } });
 
-        // Remove used verification code
         delete verificationCodes[username];
 
         return res.status(200).json({ message: 'Password updated successfully' });

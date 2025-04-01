@@ -1,0 +1,41 @@
+@startuml
+actor Accountant
+participant HomePage
+participant ocrController
+participant PythonOCRService
+participant projectController
+database Database
+
+== Uploading Files ==
+Accountant -> HomePage : Choose image files 
+Accountant -> HomePage : Click "Upload File"
+HomePage -> ocrController : POST processFiles (files, username)
+
+ocrController -> PythonOCRService : Send files for processing
+PythonOCRService -> PythonOCRService : Rotate/deskew images
+PythonOCRService -> PythonOCRService : Extract text via OCR
+PythonOCRService -> PythonOCRService : Correct errors with LLM
+PythonOCRService -> PythonOCRService : Format as JSON
+PythonOCRService --> ocrController : Return extracted JSON data
+
+ocrController -> Database : Save Project
+ocrController -> Database : Save Bills / Invoices / POs
+ocrController --> HomePage : "Files processed successfully!"
+
+== Column Selection ==
+HomePage -> Accountant : alert "Files processed successfully"
+Accountant -> HomePage : Click ok 
+HomePage -> projectController : GET /getColumnEachTable/:file_ID
+projectController -> Database : getColumn(Bill, Invoice, PO)
+Database --> projectController : Return column names each table
+projectController --> HomePage : Columns for each table
+HomePage -> Accountant : Display selectable columns
+
+== Export to Excel ==
+Accountant -> HomePage : Select desired columns
+HomePage -> projectController : POST /exportToExcelFile (file_ID, selectedColumns)
+projectController -> Database : Fetch data (Bill, Invoice, PO)
+Database --> projectController : Return data by file_ID
+projectController -> projectController : Generate Excel (pages = file_type)
+projectController --> HomePage : Excel file download link
+@enduml
