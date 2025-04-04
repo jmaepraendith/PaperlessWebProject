@@ -1,14 +1,18 @@
 @startuml
 actor Accountant
 participant Homepage
+participant Loginpage
 participant RegisterPage
 participant userController
 database Database
 
-Accountant -> Homepage : Click "Register" Button
-Homepage -> RegisterPage : Redirect to Register Page
+Accountant -> Homepage : Click "Log in" Button
+Homepage -> Loginpage : Redirect to Log in Page
 
-Accountant -> RegisterPage : Fill in Username,\nPassword, Confirm Password, Email\nAccept PDPA
+Accountant -> Loginpage : Click "Register" Button
+Loginpage -> RegisterPage : Redirect to Register Page
+
+Accountant -> RegisterPage : Fill in Username,\nPassword, Confirm Password, Email\nAccept Privacy Policy
 RegisterPage -> RegisterPage : ValidateForm()
 RegisterPage -> userController : Check username exists
 userController -> Database : findOne({ where: { username } })
@@ -18,7 +22,7 @@ RegisterPage -> RegisterPage : Check password length
 RegisterPage -> RegisterPage : Check confirmPassword match
 RegisterPage -> RegisterPage : CheckEmailPattern()
 
-RegisterPage -> Accountant : Show 'You must accept PDPA'
+RegisterPage -> Accountant : Show 'You must accept Privacy Policy'
 
 RegisterPage -> userController : Send valid form
 userController -> userController : Hash password

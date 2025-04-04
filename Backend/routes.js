@@ -5,6 +5,7 @@ const ocrController = require('./controllers/ocrController')
 const projectController = require('./controllers/projectController')
 
 router.post('/process', ocrController.processFiles);
+router.post('/processintoexistfile', ocrController.processintoexistfile);
 router.post('/signup', userController.signup);
 router.post('/login', userController.login);
 router.get('/getallusers', userController.getAllUsers);
@@ -16,9 +17,11 @@ router.post('/reset-password', userController.resetPassword);
 router.post('/verify-code', userController.verifyCodeAndUpdatePassword);
 router.delete('/deleteProject/:file_ID', projectController.deleteRecordsbyfileID);
 router.post('/exportToExcelFile/:file_ID', projectController.exportToExcelFile);
+router.post('/exportToGoogleSheet/:file_ID', projectController.exportToGoogleSheet);
 router.get('/getExcelFile/:file_ID', projectController.getExcelFile);
 router.get('/getExcelFileGuest/:file_ID', projectController.getExcelFileGuest);
 router.get('/getExcelFileallcolumn/:file_ID', projectController.allcolumnExcelFile);
-router.get('/getFileLinkfromDrive/:file_ID', projectController.getFileLinkfromDrive);
+// router.get('/getFileLinkfromDrive/:file_ID', projectController.getFileLinkfromDrive);
+router.get('/getCustomize/:file_ID', projectController.exportToGoogleSheetCustomize);
 
 module.exports = router;

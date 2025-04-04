@@ -5,9 +5,11 @@ participant ocrController
 participant PythonOCRService
 participant projectController
 database Database
+participant GoogleSheetService
 
 == Uploading Files ==
 Accountant -> HomePage : Choose image files 
+HomePage -> HomePage : View choosen image files
 Accountant -> HomePage : Click "Upload File"
 HomePage -> ocrController : POST processFiles (files, username)
 
@@ -37,5 +39,7 @@ HomePage -> projectController : POST /exportToExcelFile (file_ID, selectedColumn
 projectController -> Database : Fetch data (Bill, Invoice, PO)
 Database --> projectController : Return data by file_ID
 projectController -> projectController : Generate Excel (pages = file_type)
-projectController --> HomePage : Excel file download link
+HomePage --> GoogleSheetService : Open file in editable mode on new google sheet tab
+GoogleSheetService -> Accountant : View File
+Accountant -> GoogleSheetService : Edit + Save file
 @enduml

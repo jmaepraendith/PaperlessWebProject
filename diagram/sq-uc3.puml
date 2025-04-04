@@ -4,7 +4,6 @@ participant HomePage
 participant ActivityPage
 participant projectController
 database Database
-participant GoogleDrive
 participant GoogleSheetService
 
 == Load Projects ==
@@ -16,14 +15,12 @@ Database --> projectController : List of Projects
 projectController --> ActivityPage : Return Project Data
 ActivityPage -> Accountant : Show project list
 
-== Preview File ==
+== Customize File ==
 Accountant -> ActivityPage : Select project
-Accountant -> ActivityPage : Click "Preview"
-ActivityPage -> GoogleDrive : Open Excel File by file_ID
-GoogleDrive -> Accountant : View File
+Accountant -> ActivityPage : Click "Customize"
+ActivityPage -> GoogleSheetService : Open file in editable mode
+GoogleSheetService -> Accountant : View File
 
-Accountant -> GoogleDrive : Click "Open in Google Sheets"
-GoogleDrive -> GoogleSheetService : Open file in editable mode
 Accountant -> GoogleSheetService : Edit + Save file
 
 == Download File ==

@@ -3,7 +3,6 @@ actor Accountant
 participant HomePage
 participant projectController
 database Database
-participant GoogleDrive
 
 == Log in User ==
 Accountant -> HomePage : Click "Download File"
@@ -14,8 +13,6 @@ Database --> projectController : Return data
 projectController -> projectController : Generate Excel file
 projectController --> HomePage : Download Excel file
 HomePage -> Accountant : Save file to device
-projectController -> GoogleDrive : Upload Excel file
-GoogleDrive --> projectController : Upload successfully 
 
 == Guest ==
 Accountant -> HomePage : Click "Download File"

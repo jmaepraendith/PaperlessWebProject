@@ -158,6 +158,42 @@ exports.updateFileName = async (req, res) => {
 };
 
 
+// exports.getColumnEachTable = async (req, res) => {
+//     try {
+//         const { file_ID } = req.params;
+
+//         const project = await Project.findOne({ where: { file_ID } });
+//         if (!project) {
+//             return res.status(404).json({ message: "Project not found" });
+//         }
+
+//         const billExists = await Bill.findOne({ where: { file_ID } });
+//         const invoiceExists = await Invoice.findOne({ where: { file_ID } });
+//         const purchaseOrderExists = await PurchaseOrder.findOne({ where: { file_ID } });
+
+//         let tablesWithfile_ID = [];
+//         if (billExists) tablesWithfile_ID.push("Bill");
+//         if (invoiceExists) tablesWithfile_ID.push("Invoice");
+//         if (purchaseOrderExists) tablesWithfile_ID.push("PurchaseOrder");
+
+//         const ColumnEachTable = await Promise.all(
+//             tablesWithfile_ID.map(async (tableName) => {
+//                 const tableColumns = await sequelize.getQueryInterface().describeTable(tableName);
+//                 return {
+//                     table: tableName,
+//                     columns: Object.keys(tableColumns).map(col => col.replace(/_/g, ' ')) // Extract column names
+//                 };
+//             })
+//         );
+
+//         return res.status(200).json(ColumnEachTable);
+//     } catch (error) {
+//         console.error("Error fetching columns:", error);
+//         return res.status(500).json({ message: "Internal server error" });
+//     }
+// };
+
+
 exports.getColumnEachTable = async (req, res) => {
     try {
         const { file_ID } = req.params;
@@ -179,9 +215,20 @@ exports.getColumnEachTable = async (req, res) => {
         const ColumnEachTable = await Promise.all(
             tablesWithfile_ID.map(async (tableName) => {
                 const tableColumns = await sequelize.getQueryInterface().describeTable(tableName);
+
+                // Get one sample record
+                const [record] = await sequelize.models[tableName].findAll({
+                    where: { file_ID },
+                    limit: 1,
+                    raw: true
+                });
+
                 return {
                     table: tableName,
-                    columns: Object.keys(tableColumns).map(col => col.replace(/_/g, ' ')) // Extract column names
+                    columns: Object.keys(tableColumns).map(col => ({
+                        name: col.replace(/_/g, ' '),
+                        value: record?.[col] ?? null
+                    }))
                 };
             })
         );
@@ -192,6 +239,7 @@ exports.getColumnEachTable = async (req, res) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 };
+
 
 exports.exportToExcelFile = async (req, res) => {
     try {
@@ -302,13 +350,17 @@ exports.getExcelFile = async (req, res) => {
 
             console.log(`File sent for download: ${filePath}`);
 
+            // Delete the file after successful sent
+            fs.unlinkSync(filePath);
+            console.log("File deleted from local exports folder:", filePath);
+
             // Upload the file to Google Drive after successful download
-            const fileUrl = await uploadToGoogleDrive(filePath);
-            if (fileUrl) {
-                console.log(`File uploaded to Google Drive: ${fileUrl}`);
-            } else {
-                console.error("Failed to upload file to Google Drive.");
-            }
+            // const fileUrl = await uploadToGoogleDrive(filePath);
+            // if (fileUrl) {
+            //     console.log(`File uploaded to Google Drive: ${fileUrl}`);
+            // } else {
+            //     console.error("Failed to upload file to Google Drive.");
+            // }
         });
 
     } catch (error) {
@@ -321,10 +373,13 @@ exports.getExcelFile = async (req, res) => {
 
 
 const { google } = require('googleapis');
-const SCOPE = ['https://www.googleapis.com/auth/drive'];
+const SCOPE = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"];
 const path = require('path');
 const fs = require('fs');
 const apikeys = require(path.join(__dirname, '../paperlessAPI.json'));
+
+
+
 
 async function authorize() {
     const jwtClient = new google.auth.JWT(
@@ -337,89 +392,90 @@ async function authorize() {
     return jwtClient;
 }
 
-const uploadToGoogleDrive = async (filePath) => {
-    try {
-        if (!fs.existsSync(filePath)) {
-            console.error("File does not exist:", filePath);
-            return null;
-        }
 
-        const authClient = await authorize();
-        const drive = google.drive({ version: 'v3', auth: authClient });
+// const uploadToGoogleDrive = async (filePath) => {
+//     try {
+//         if (!fs.existsSync(filePath)) {
+//             console.error("File does not exist:", filePath);
+//             return null;
+//         }
 
-        const fileMetadata = {
-            name: path.basename(filePath),
-            // parents: ["11Vz-D_TgIRhkixXY5wr6xZnvqejx2Lxe"], //  folder ID jj
-            parents: ["1C5bpzb5kU4K2a4MlyecLTk8BvxjClQri"], //  folder ID jp
-        };
+//         const authClient = await authorize();
+//         const drive = google.drive({ version: 'v3', auth: authClient });
 
-        const media = {
-            mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            body: fs.createReadStream(filePath),
-        };
+//         const fileMetadata = {
+//             name: path.basename(filePath),
+//             // parents: ["11Vz-D_TgIRhkixXY5wr6xZnvqejx2Lxe"], //  folder ID jj
+//             parents: ["1C5bpzb5kU4K2a4MlyecLTk8BvxjClQri"], //  folder ID jp
+//         };
 
-        const file = await drive.files.create({
-            resource: fileMetadata,
-            media: media,
-            fields: 'id',
-        });
+//         const media = {
+//             mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+//             body: fs.createReadStream(filePath),
+//         };
 
-        await drive.permissions.create({
-            fileId: file.data.id,
-            requestBody: {
-                role: 'writer',
-                type: 'anyone',
-            },
-        });
+//         const file = await drive.files.create({
+//             resource: fileMetadata,
+//             media: media,
+//             fields: 'id',
+//         });
 
-        const fileUrl = `https://drive.google.com/file/d/${file.data.id}/view`;
+//         await drive.permissions.create({
+//             fileId: file.data.id,
+//             requestBody: {
+//                 role: 'writer',
+//                 type: 'anyone',
+//             },
+//         });
 
-        console.log("File uploaded to Google Drive:", fileUrl);
+//         const fileUrl = `https://drive.google.com/file/d/${file.data.id}/view`;
 
-        // Delete the file after successful upload
-        fs.unlinkSync(filePath);
-        console.log("File deleted from local exports folder:", filePath);
+//         console.log("File uploaded to Google Drive:", fileUrl);
 
-        return fileUrl;
+//         // Delete the file after successful upload
+//         fs.unlinkSync(filePath);
+//         console.log("File deleted from local exports folder:", filePath);
 
-    } catch (error) {
-        console.error("Error uploading to Google Drive:", error);
-        return null;
-    }
-};
+//         return fileUrl;
+
+//     } catch (error) {
+//         console.error("Error uploading to Google Drive:", error);
+//         return null;
+//     }
+// };
 
 
-exports.getFileLinkfromDrive = async (req, res) => {
-    try {
-        const { file_ID } = req.params;
+// exports.getFileLinkfromDrive = async (req, res) => {
+//     try {
+//         const { file_ID } = req.params;
 
-        if (!file_ID) {
-            return res.status(400).json({ message: "File ID is required." });
-        }
+//         if (!file_ID) {
+//             return res.status(400).json({ message: "File ID is required." });
+//         }
 
-        const authClient = await authorize();
-        const drive = google.drive({ version: 'v3', auth: authClient });
+//         const authClient = await authorize();
+//         const drive = google.drive({ version: 'v3', auth: authClient });
 
-        const fileName = `Project_${file_ID}.xlsx`;
-        const response = await drive.files.list({
-            q: `name='${fileName}' and trashed=false`,
-            fields: 'files(id, name)',
-        });
+//         const fileName = `Project_${file_ID}.xlsx`;
+//         const response = await drive.files.list({
+//             q: `name='${fileName}' and trashed=false`,
+//             fields: 'files(id, name)',
+//         });
 
-        if (response.data.files.length === 0) {
-            return res.status(404).json({ message: "File not found on Google Drive." });
-        }
+//         if (response.data.files.length === 0) {
+//             return res.status(404).json({ message: "File not found on Google Drive." });
+//         }
 
-        const fileId = response.data.files[0].id;
-        const fileUrl = `https://drive.google.com/file/d/${fileId}/view`;
+//         const fileId = response.data.files[0].id;
+//         const fileUrl = `https://drive.google.com/file/d/${fileId}/view`;
 
-        res.json({ fileUrl });
+//         res.json({ fileUrl });
 
-    } catch (error) {
-        console.error("Error fetching file from Google Drive:", error);
-        res.status(500).json({ message: "Internal Server Error" });
-    }
-};
+//     } catch (error) {
+//         console.error("Error fetching file from Google Drive:", error);
+//         res.status(500).json({ message: "Internal Server Error" });
+//     }
+// };
 
 
 
@@ -449,23 +505,23 @@ exports.deleteRecordsbyfileID = async (req, res) => {
         await Project.destroy({ where: { file_ID } });
 
 
-        const authClient = await authorize();
-        const drive = google.drive({ version: 'v3', auth: authClient });
+        // const authClient = await authorize();
+        // const drive = google.drive({ version: 'v3', auth: authClient });
 
-        const fileName = `Project_${file_ID}.xlsx`;
+        // const fileName = `Project_${file_ID}.xlsx`;
 
-        // Find the file in Google Drive
-        const response = await drive.files.list({
-            q: `name='${fileName}' and trashed=false`,
-            fields: 'files(id, name)',
-        });
+        // // Find the file in Google Drive
+        // const response = await drive.files.list({
+        //     q: `name='${fileName}' and trashed=false`,
+        //     fields: 'files(id, name)',
+        // });
 
-        if (response.data.files.length === 0) {
-            console.log(`File ${fileName} not found on Google Drive.`);
-            return res.status(200).json({ message: "Project deleted, but no matching file found in Google Drive." });
-        }
-        const fileId = response.data.files[0].id;
-        await drive.files.delete({ fileId });
+        // if (response.data.files.length === 0) {
+        //     console.log(`File ${fileName} not found on Google Drive.`);
+        //     return res.status(200).json({ message: "Project deleted, but no matching file found in Google Drive." });
+        // }
+        // const fileId = response.data.files[0].id;
+        // await drive.files.delete({ fileId });
 
         return res.status(200).json({ message: "Your project has been deleted successfully"});
 
@@ -524,6 +580,264 @@ exports.getExcelFileGuest = async (req, res) => {
 
     } catch (error) {
         console.error("Error retrieving Excel file:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+
+exports.exportToGoogleSheet = async (req, res) => {
+    try {
+        const { file_ID } = req.params;
+        const { selectedData } = req.body;
+
+        if (!file_ID) {
+            return res.status(400).json({ message: "File ID is required." });
+        }
+
+        if (!selectedData || selectedData.length === 0) {
+            return res.status(400).json({ message: "No selected tables/columns provided." });
+        }
+
+        const project = await Project.findOne({ where: { file_ID } });
+        if (!project) {
+            return res.status(404).json({ message: "Project not found" });
+        }
+
+        const bills = await Bill.findAll({ where: { file_ID } });
+        const invoices = await Invoice.findAll({ where: { file_ID } });
+        const purchaseOrders = await PurchaseOrder.findAll({ where: { file_ID } });
+
+        const tablesWithSelectedData = [];
+
+        for (const { table, selectedColumns } of selectedData) {
+            if (!selectedColumns || selectedColumns.length === 0) continue;
+
+            if (table === "Bill" && bills.length > 0) {
+                tablesWithSelectedData.push({
+                    name: "Bills",
+                    columns: selectedColumns,
+                    data: bills,
+                });
+            }
+
+            if (table === "Invoice" && invoices.length > 0) {
+                tablesWithSelectedData.push({
+                    name: "Invoices",
+                    columns: selectedColumns,
+                    data: invoices,
+                });
+            }
+
+            if (table === "PurchaseOrder" && purchaseOrders.length > 0) {
+                tablesWithSelectedData.push({
+                    name: "Purchase Orders",
+                    columns: selectedColumns,
+                    data: purchaseOrders,
+                });
+            }
+        }
+
+        if (tablesWithSelectedData.length === 0) {
+            return res.status(404).json({ message: "No relevant data found for export." });
+        }
+
+        const sheetUrl = await uploadToGoogleSheetWithSelection(file_ID, tablesWithSelectedData);
+        if (!sheetUrl) {
+            return res.status(500).json({ message: "Failed to create Google Sheet." });
+        }
+
+        res.json({ message: "Google Sheet created successfully", sheetUrl });
+
+    } catch (error) {
+        console.error("Error exporting to Google Sheets:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+const uploadToGoogleSheetWithSelection = async (file_ID, tablesWithSelectedData) => {
+    try {
+        const authClient = await authorize();
+        const sheets = google.sheets({ version: "v4", auth: authClient });
+        const drive = google.drive({ version: "v3", auth: authClient });
+
+        const sheetResponse = await sheets.spreadsheets.create({
+            resource: { properties: { title: `Project_${file_ID}` } },
+        });
+
+        const spreadsheetId = sheetResponse.data.spreadsheetId;
+        let createdSheetIds = [];
+
+        // สร้างชีตใหม่ตามตารางที่เลือก
+        for (const table of tablesWithSelectedData) {
+            const sheetName = table.name;
+            const selectedCols = table.columns;
+
+            const values = [selectedCols];
+            for (const item of table.data) {
+                const row = selectedCols.map(displayCol => {
+                    const dbCol = displayCol.replace(/ /g, "_");
+                    return item[dbCol] !== undefined ? item[dbCol] : "N/A";
+                });
+                values.push(row);
+            }
+
+            const addSheetResponse = await sheets.spreadsheets.batchUpdate({
+                spreadsheetId,
+                resource: {
+                    requests: [{ addSheet: { properties: { title: sheetName } } }],
+                },
+            });
+
+            // เก็บ sheetId ของชีตที่สร้าง
+            const newSheetId = addSheetResponse.data.replies[0].addSheet.properties.sheetId;
+            createdSheetIds.push(newSheetId);
+
+            await sheets.spreadsheets.values.update({
+                spreadsheetId,
+                range: `${sheetName}!A1`,
+                valueInputOption: "RAW",
+                resource: { values },
+            });
+        }
+
+        // ลบ Sheet1 ถ้ามี (และต้องแน่ใจว่ามีชีตอื่นอยู่ก่อน)
+        const sheetsInfo = await sheets.spreadsheets.get({ spreadsheetId });
+        const sheet1 = sheetsInfo.data.sheets.find(s => s.properties.title === "Sheet1");
+
+        if (sheet1 && createdSheetIds.length > 0) {
+            await sheets.spreadsheets.batchUpdate({
+                spreadsheetId,
+                resource: {
+                    requests: [{ deleteSheet: { sheetId: sheet1.properties.sheetId } }],
+                },
+            });
+        }
+
+        await drive.permissions.create({
+            fileId: spreadsheetId,
+            requestBody: {
+                role: "writer",
+                type: "anyone",
+            },
+        });
+
+        return `https://docs.google.com/spreadsheets/d/${spreadsheetId}`;
+
+    } catch (error) {
+        console.error("Error creating Google Sheet with selected data:", error);
+        return null;
+    }
+};
+
+
+
+const uploadToGoogleSheetCustomize = async (file_ID, data) => {
+    try {
+        const authClient = await authorize();
+        const sheets = google.sheets({ version: "v4", auth: authClient });
+        const drive = google.drive({ version: "v3", auth: authClient });
+
+        // 🔹 Create new Google Sheet
+        const sheetResponse = await sheets.spreadsheets.create({
+            resource: { properties: { title: `Project_${file_ID}` } },
+        });
+
+        const spreadsheetId = sheetResponse.data.spreadsheetId;
+        console.log(`Created Spreadsheet: https://docs.google.com/spreadsheets/d/${spreadsheetId}`);
+
+        // 🔹 First create all the sheets we need
+        const requests = data.map(table => ({
+            addSheet: { properties: { title: table.name } }
+        }));
+
+        await sheets.spreadsheets.batchUpdate({
+            spreadsheetId,
+            resource: { requests },
+        });
+
+        // 🔹 Now we can safely delete Sheet1 since we have other sheets
+        await sheets.spreadsheets.batchUpdate({
+            spreadsheetId,
+            resource: {
+                requests: [{
+                    deleteSheet: {
+                        sheetId: 0  // Sheet1 always has sheetId 0 in a new spreadsheet
+                    }
+                }],
+            },
+        });
+
+        // 🔹 Insert data into each sheet
+        for (const table of data) {
+            const sheetName = table.name;
+            const values = [
+                Object.keys(table.data[0].dataValues), 
+                ...table.data.map(item => Object.values(item.dataValues))
+            ];
+
+            await sheets.spreadsheets.values.update({
+                spreadsheetId,
+                range: `${sheetName}!A1`,
+                valueInputOption: "RAW",
+                resource: { values },
+            });
+        }
+
+        // 🔥 Set permissions to allow anyone to edit
+        await drive.permissions.create({
+            fileId: spreadsheetId,
+            requestBody: {
+                role: "writer",
+                type: "anyone",
+            },
+        });
+
+        return `https://docs.google.com/spreadsheets/d/${spreadsheetId}`;
+
+    } catch (error) {
+        console.error("Error uploading to Google Sheets:", error);
+        return null;
+    }
+};
+
+exports.exportToGoogleSheetCustomize = async (req, res) => {
+    try {
+        const { file_ID } = req.params;
+        if (!file_ID) {
+            return res.status(400).json({ message: "File ID is required." });
+        }
+
+        // 🔹 ค้นหาโครงการจาก file_ID
+        const project = await Project.findOne({ where: { file_ID } });
+        if (!project) {
+            return res.status(404).json({ message: "Project not found" });
+        }
+
+        // 🔹 ดึงข้อมูลจากฐานข้อมูล
+        const tablesWithData = [];
+        const bills = await Bill.findAll({ where: { file_ID } });
+        if (bills.length > 0) tablesWithData.push({ name: "Bills", data: bills });
+
+        const invoices = await Invoice.findAll({ where: { file_ID } });
+        if (invoices.length > 0) tablesWithData.push({ name: "Invoices", data: invoices });
+
+        const purchaseOrders = await PurchaseOrder.findAll({ where: { file_ID } });
+        if (purchaseOrders.length > 0) tablesWithData.push({ name: "Purchase Orders", data: purchaseOrders });
+
+        if (tablesWithData.length === 0) {
+            return res.status(404).json({ message: "No relevant data found for export" });
+        }
+
+        // 🔥 อัปโหลดไปยัง Google Sheets
+        const sheetUrl = await uploadToGoogleSheetCustomize(file_ID, tablesWithData);
+        if (!sheetUrl) {
+            return res.status(500).json({ message: "Failed to create Google Sheet." });
+        }
+
+        res.json({ message: "Google Sheet created successfully", sheetUrl });
+
+    } catch (error) {
+        console.error("Error exporting to Google Sheets:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 };

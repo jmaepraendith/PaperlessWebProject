@@ -17,43 +17,144 @@ const HomePage = () => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const { username } = useParams();
+  const [previewUrls, setPreviewUrls] = useState([]);
+  const [uploadMode, setUploadMode] = useState(null); 
+  const [userFiles, setUserFiles] = useState([]);
+  const [selectedAppendFileID, setSelectedAppendFileID] = useState(null);
 
-  // Handle file selection
-  const handleFileChange = (e) => {
-    setFiles([...e.target.files]);
-    setUploadProgress(0);
+
+  const fetchUserFiles = async () => {
+    try {
+      const response = await axios.get(`http://localhost:13889/paperless/activities/${username}`);
+      setUserFiles(response.data); // สมมติว่า response.data เป็น array ของไฟล์
+    } catch (error) {
+      console.error("Error fetching user files:", error);
+      alert("Failed to fetch user files.");
+    }
   };
 
+  const handleModeSelect = (mode) => {
+    setUploadMode(mode);
+    if (mode === 'append') {
+      fetchUserFiles();
+    }
+  };
+  
+
+
+  // Handle file selection
+  // const handleFileChange = (e) => {
+  //   setFiles([...e.target.files]);
+  //   setUploadProgress(0);
+  // };
+
+  const handleFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    setFiles(selectedFiles);
+    setUploadProgress(0);
+  
+    const urls = selectedFiles.map(file => URL.createObjectURL(file));
+    setPreviewUrls(urls);
+  };
+  
+
+  // const handleUpload = async () => {
+  //   if (files.length === 0) {
+  //     alert("Please select at least one file!");
+  //     return;
+  //   }
+  //   setProcessing(true);
+  //   const formData = new FormData();
+  //   files.forEach(file => {
+  //     formData.append('files', file);
+  //   });
+  //   formData.append('username', username);
+
+  //   try {
+
+  //     const response = await axios.post('http://localhost:13889/paperless/process', formData, {
+  //       headers: { 'Content-Type': 'multipart/form-data' },
+  //       onUploadProgress: (progressEvent) => {
+  //         const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+  //         setUploadProgress(percentCompleted);
+  //       }
+  //     });
+
+  //     setFileID(response.data.file_ID);
+  //     setJsonData(response.data);
+
+  //     alert("Files processed successfully!");  
+
+  //     // Fetch available columns based on file ID
+  //     fetchColumns(response.data.file_ID);
+
+  //   } catch (error) {
+  //     console.error("Error processing files:", error);
+  //     alert("Failed to process files.");
+  //   } finally {
+  //     setProcessing(false);
+  //   }
+  // };
+
+
   const handleUpload = async () => {
+    if (!uploadMode) {
+      alert("Please select upload mode (Create new or Append).");
+      return;
+    }
+  
     if (files.length === 0) {
       alert("Please select at least one file!");
       return;
     }
+  
+    if (uploadMode === 'append' && !selectedAppendFileID) {
+      alert("Please select a file to append to.");
+      return;
+    }
+  
     setProcessing(true);
     const formData = new FormData();
-    files.forEach(file => {
-      formData.append('files', file);
-    });
+    files.forEach(file => formData.append('files', file));
     formData.append('username', username);
-
+  
     try {
-
-      const response = await axios.post('http://localhost:13889/paperless/process', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          setUploadProgress(percentCompleted);
-        }
-      });
-
-      setFileID(response.data.file_ID);
-      setJsonData(response.data);
-
-      alert("Files processed successfully!");  
-
-      // Fetch available columns based on file ID
-      fetchColumns(response.data.file_ID);
-
+      let response;
+  
+      if (uploadMode === 'new') {
+        // 🆕 CREATE NEW PROJECT
+        response = await axios.post('http://localhost:13889/paperless/process', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setUploadProgress(percentCompleted);
+          }
+        });
+  
+        setFileID(response.data.file_ID);
+        setJsonData(response.data);
+        alert("Files processed successfully!");
+        fetchColumns(response.data.file_ID);
+  
+      } else if (uploadMode === 'append') {
+        // 🔁 APPEND INTO EXISTING FILE
+        formData.append('target_file_ID', selectedAppendFileID);
+  
+        response = await axios.post('http://localhost:13889/paperless/processintoexistfile', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setUploadProgress(percentCompleted);
+          }
+        });
+  
+        setFileID(response.data.file_ID);
+        setJsonData(response.data);
+        alert("Files appended successfully!");
+        fetchColumns(response.data.file_ID); 
+  
+      }
+  
     } catch (error) {
       console.error("Error processing files:", error);
       alert("Failed to process files.");
@@ -61,7 +162,7 @@ const HomePage = () => {
       setProcessing(false);
     }
   };
-
+  
   
   // Fetch columns from the backend
   const fetchColumns = async (file_ID) => {
@@ -99,42 +200,88 @@ const HomePage = () => {
     });
   };
   
+  // const handleConfirmSelection = async (fileID) => {
+  //   // Check if any columns are selected
+  //   const hasSelectedColumns = Object.values(selectedColumns).some(
+  //     columnArray => columnArray && columnArray.length > 0
+  //   );
+    
+  //   if (!hasSelectedColumns) {
+  //     alert("Please select at least one column!");
+  //     return;
+  //   }
+    
+  //   setIsConfirmed(true);
+
+  //   const selectedData = availableColumns
+  //     .map((table) => ({
+  //       table: table.table,
+  //       selectedColumns: selectedColumns[table.table] || [] 
+  //     }))
+  //     .filter(table => table.selectedColumns.length > 0);
+
+  //   console.log("Sending structured data:", selectedData);
+
+  //   try {
+  //     const response = await axios.post(
+  //       // `http://localhost:13889/paperless/exportToExcelFile/${fileID}`, 
+  //       // { selectedData } 
+  //       `http://localhost:13889/paperless/exportToGoogleSheet/${fileID}`, 
+  //       { selectedData } 
+  //     );
+
+  //     if (response.status === 200) {
+  //       const newTab = window.open('', '_blank'); // เปิดแท็บใหม่ไว้ก่อน
+  //       alert("Excel file created successfully!");
+  //       newTab.location.href = response.data.sheetUrl; // เปลี่ยน URL หลัง alert
+  //     }
+      
+  //   } catch (error) {
+  //     console.error("Error confirming selection:", error.response ? error.response.data : error.message);
+  //     alert("Failed to create Excel file.");
+  //   }
+  // };
+
   const handleConfirmSelection = async (fileID) => {
     // Check if any columns are selected
     const hasSelectedColumns = Object.values(selectedColumns).some(
       columnArray => columnArray && columnArray.length > 0
     );
-    
+
     if (!hasSelectedColumns) {
       alert("Please select at least one column!");
       return;
     }
-    
+
     setIsConfirmed(true);
 
     const selectedData = availableColumns
       .map((table) => ({
         table: table.table,
-        selectedColumns: selectedColumns[table.table] || [] 
+        selectedColumns: selectedColumns[table.table] || []
       }))
       .filter(table => table.selectedColumns.length > 0);
 
     console.log("Sending structured data:", selectedData);
 
     try {
-      const response = await axios.post(
-        `http://localhost:13889/paperless/exportToExcelFile/${fileID}`, 
-        { selectedData } 
-      );
+        const [excelResponse, sheetResponse] = await Promise.all([
+            axios.post(`http://localhost:13889/paperless/exportToExcelFile/${fileID}`, { selectedData }),
+            axios.post(`http://localhost:13889/paperless/exportToGoogleSheet/${fileID}`, { selectedData })
+        ]);
 
-      if (response.status === 200) {
-        alert("Excel file created successfully!");
-      }
+        if (excelResponse.status === 200 && sheetResponse.status === 200) {
+            const newTab = window.open('', '_blank'); 
+            alert("Excel file and Google Sheet created successfully!");
+            newTab.location.href = sheetResponse.data.sheetUrl; // เปิด Google Sheet
+        }
+
     } catch (error) {
-      console.error("Error confirming selection:", error.response ? error.response.data : error.message);
-      alert("Failed to create Excel file.");
+        console.error("Error confirming selection:", error.response ? error.response.data : error.message);
+        alert("Failed to create files.");
     }
-  };
+};
+
 
   const handleDownload = async (file_ID) => {
     try {
@@ -238,6 +385,76 @@ const HomePage = () => {
         
         <div className="upload-container">
           <input type="file" multiple onChange={handleFileChange} />
+          <div style={{
+            maxWidth: '100%',
+            width: '80vw', 
+            margin: '0 auto',
+            overflowX: 'auto',
+            overflowY: 'hidden',
+            whiteSpace: 'nowrap',
+            paddingBottom: '0.5rem',
+            borderBottom: '2px solid #ccc' // optional visual separation
+          }}>
+            <div style={{
+              display: 'inline-flex',
+              gap: '1rem'
+            }}>
+              {previewUrls.map((url, index) => (
+                <img
+                  key={index}
+                  src={url}
+                  alt={`preview-${index}`}
+                  style={{
+                    width: '200px',
+                    height: 'auto',
+                    borderRadius: '8px',
+                    border: '1px solid #ccc'
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+
+          <div className="upload-mode-container">
+            <button 
+              className={`upload-mode-button ${uploadMode === 'new' ? 'selected-mode' : ''}`} 
+              onClick={() => setUploadMode('new')}
+            >
+              Create New Project
+            </button>
+            <button 
+              className={`upload-mode-button ${uploadMode === 'append' ? 'selected-mode' : ''}`} 
+              onClick={() => handleModeSelect('append')}
+            >
+              Append into Existing File
+            </button>
+          </div>
+          {uploadMode === 'append' && userFiles.length > 0 && (
+            <div className="existing-files">
+              <h4>Select a file to append to:</h4>
+              <ul>
+                {userFiles.map((file, index) => {
+                  const displayName = file.file_name || `File ID: ${file.file_ID}`;
+                  const isSelected = selectedAppendFileID === file.file_ID;
+                  
+                  return (
+                    <li 
+                      key={index} 
+                      className={`append-file-option ${isSelected ? 'selected' : ''}`}
+                      onClick={() => setSelectedAppendFileID(file.file_ID)}
+                    >
+                      {displayName}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+
+
+              
+          
           <button className='upload' onClick={handleUpload} disabled={processing}>
             {processing ? "Processing..." : "Upload File"}
           </button>
@@ -256,19 +473,53 @@ const HomePage = () => {
             <h3>Select columns to include in your Excel</h3>
             <p>Click on columns to select them (green = selected, white = not selected)</p> 
             
-            <div className="column-selection-grid">
+            <div className="column-selection-grid"> 
               {availableColumns.length > 0 ? (
                 availableColumns.map((table) => (
                   <div key={table.table} className="table-section">
                     <h3>{table.table}</h3>
                     <div className="column-buttons">
-                      {table.columns.map((column) => (
+                      {table.columns.map((columnObj) => (
                         <button
-                          key={column}
-                          className={`column-button ${selectedColumns[table.table]?.includes(column) ? 'column-button-selected' : ''}`}
-                          onClick={() => toggleColumnSelection(table.table, column)}
+                          key={columnObj.name}
+                          className={`column-button ${selectedColumns[table.table]?.includes(columnObj.name) ? 'column-button-selected' : ''}`}
+                          onClick={() => toggleColumnSelection(table.table, columnObj.name)}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'stretch'
+                          }}
                         >
-                          {column}
+                          <div style={{ 
+                            fontWeight: 'bold', 
+                            fontSize: '1rem', 
+                            textAlign: 'center' 
+                          }}>
+                            {columnObj.name}
+                          </div>
+                          <div style={{ 
+                              fontSize: '0.9rem', 
+                              fontFamily: 'monospace', 
+                              marginTop: '0.3em',
+                        
+                              textAlign: 'left'
+                            }}>
+                              {columnObj.value !== null ? (
+                                <>
+                                  <span style={{ fontWeight: '500', color: '#3A5D40' }}>
+                                    Example record data:
+                                  </span>{' '}
+                                  <span style={{ color: '#092558' }}>
+                                    {columnObj.value.toString()}
+                                  </span>
+                                </>
+                              ) : (
+                                <span style={{ color: 'rgba(0, 0, 0, 0.5)', fontStyle: 'italic' }}>
+                                  No extracted data
+                                </span>
+                              )}
+                            </div>
+
                         </button>
                       ))}
                     </div>
@@ -289,17 +540,18 @@ const HomePage = () => {
         )}
 
         {isConfirmed && (
-          <div className="download-section">
-            <p>Your selection has been confirmed!</p>
-            <h3>You can download this file again in your projects.</h3>
-            <h3>Be sure to click download here first.</h3>
-            <button
-              className="btn-download"
-              onClick={() => handleDownload(fileID)}
-            >
-              Download Excel File
-            </button>
-          </div>
+         <div className="download-section">
+         <h4>Please wait for our website to navigate you to a new Google Sheet tab.<br /> You can check your data there.</h4>
+         
+         <h3>This file with selected columns can be downloaded <br /> only once here.</h3>
+         <h2>Be sure to click download to save your file.</h2>
+         <button
+           className="btn-download"
+           onClick={() => handleDownload(fileID)}
+         >
+           Download Excel File
+         </button>
+       </div>
         )}
       </div>
     </div>

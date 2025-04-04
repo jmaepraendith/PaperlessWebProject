@@ -90,7 +90,6 @@ const ActivityPage = () => {
         alert("Failed to delete project. Please try again.");
     }
   };
-
   const handlePreview = async (file_ID) => {
     if (!file_ID) {
         alert("No file selected for preview.");
@@ -98,28 +97,28 @@ const ActivityPage = () => {
     }
 
     try {
-        console.log(`Fetching file link for: ${file_ID}`); // Debugging Step
-
-        const response = await fetch(`http://localhost:13889/paperless/getFileLinkfromDrive/${file_ID}`);
+        console.log(`Fetching file link for: ${file_ID}`);
+        const response = await fetch(`http://localhost:13889/paperless/getCustomize/${file_ID}`);
         
         if (!response.ok) {
-            throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+            const errorData = await response.json();
+            throw new Error(errorData.message || `HTTP Error: ${response.status}`);
         }
 
         const data = await response.json();
-        console.log("File Response Data:", data); // Debugging Step
+        console.log("File Response Data:", data);
 
-        if (data.fileUrl) {
-            console.log("Opening file:", data.fileUrl);
-            window.open(data.fileUrl, '_blank'); // Opens file in a new tab
+        if (data.sheetUrl) {  // Changed from data.fileUrl to data.sheetUrl
+            console.log("Opening file:", data.sheetUrl);
+            window.open(data.sheetUrl, '_blank');
         } else {
-            alert("File not found on Google Drive.");
+            alert("Google Sheet not found or could not be created.");
         }
     } catch (error) {
         console.error("Error opening preview:", error);
         alert(`Error fetching file link: ${error.message}`);
     }
-  };
+};
 
   const handleDownload = async (file_ID) => {
     try {
@@ -226,8 +225,8 @@ const ActivityPage = () => {
                   </span>
                 )}
 
-                <button className="btn preview" onClick={() => handlePreview(activity.file_ID)}>Preview</button>
-                <button className="btn download" onClick={() => handleDownload(activity.file_ID)}>Download <span className="all-column">(All Column)</span></button>
+                <button className="btn preview" onClick={() => handlePreview(activity.file_ID)}>Customize</button>
+                <button className="btn download" onClick={() => handleDownload(activity.file_ID)}>Download All Columns</button>
                 <button className="btn delete" onClick={() => handleDelete(activity.file_ID)}>Delete</button>
               </div>
             </section>

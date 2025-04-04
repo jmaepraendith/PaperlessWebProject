@@ -1,0 +1,51 @@
+@startuml
+actor Accountant
+participant HomePage
+participant ocrController
+participant PythonOCRService
+participant projectController
+database Database
+participant GoogleSheetService
+
+== Uploading Files ==
+Accountant -> HomePage : Choose image files 
+HomePage -> HomePage : View choosen image files
+Accountant-> HomePage : Select whether to Create New Project or Append into Existing File
+Accountant-> HomePage: if Selected Append into Existing File
+HomePage->projectController: Get all project of this username
+projectController -> HomePage: Return all project of this username
+HomePage -> Accountant: Show all existing project name or file_id
+Accountant -> HomePage : Selected existing project
+Accountant -> HomePage : Click "Upload File"
+HomePage -> ocrController : POST processFiles (files, username , file_id if Selected existing project)
+
+ocrController -> PythonOCRService : Send files for processing
+PythonOCRService -> PythonOCRService : Rotate/deskew images
+PythonOCRService -> PythonOCRService : Extract text via OCR
+PythonOCRService -> PythonOCRService : Correct errors with LLM
+PythonOCRService -> PythonOCRService : Format as JSON
+PythonOCRService --> ocrController : Return extracted JSON data
+
+ocrController -> Database : Save Project
+ocrController -> Database : Save Bills / Invoices / POs
+ocrController --> HomePage : "Files processed successfully!"
+
+== Column Selection ==
+HomePage -> Accountant : alert "Files processed successfully"
+Accountant -> HomePage : Click ok 
+HomePage -> projectController : GET /getColumnEachTable/:file_ID
+projectController -> Database : getColumn(Bill, Invoice, PO)
+Database --> projectController : Return column names each table
+projectController --> HomePage : Columns for each table
+HomePage -> Accountant : Display selectable columns
+
+== Export to Excel ==
+Accountant -> HomePage : Select desired columns
+HomePage -> projectController : POST /exportToExcelFile (file_ID, selectedColumns)
+projectController -> Database : Fetch data (Bill, Invoice, PO)
+Database --> projectController : Return data by file_ID
+projectController -> projectController : Generate Excel (pages = file_type)
+HomePage --> GoogleSheetService : Open file in editable mode on new google sheet tab
+GoogleSheetService -> Accountant : View File
+Accountant -> GoogleSheetService : Edit + Save file
+@enduml

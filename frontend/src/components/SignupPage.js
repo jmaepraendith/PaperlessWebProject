@@ -203,11 +203,11 @@ const SignupPage = () => {
                             <span className="pdpa-front">
                                 I have read and accept the{' '}
                                 <span className="tooltip">
-                                    PDPA policy
-                                    <span className="tooltiptext">
-                                        We value your privacy. By signing up, you consent to the collection and use of your personal data in accordance with our PDPA policy. Your filea will be used to train LLM model.
+                                      Privacy Policy.
+                                <span className="tooltiptext">
+                                        We value your privacy. By signing up, you consent to the collection and use of your personal data in accordance with our privacy policy. Your files will be used to train LLM model.
                                     </span>
-                                </span>.
+                                </span>
                             </span>
                         </label>
                         {!pdpaAccepted && formErrors.pdpa && (
