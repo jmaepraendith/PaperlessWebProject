@@ -226,7 +226,7 @@ const ActivityPage = () => {
                 )}
 
                 <button className="btn preview" onClick={() => handlePreview(activity.file_ID)}>Customize</button>
-                <button className="btn download" onClick={() => handleDownload(activity.file_ID)}>Download All Columns</button>
+                <button className="btn download" onClick={() => handleDownload(activity.file_ID)}>Download</button>
                 <button className="btn delete" onClick={() => handleDelete(activity.file_ID)}>Delete</button>
               </div>
             </section>
