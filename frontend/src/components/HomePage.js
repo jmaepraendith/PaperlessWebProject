@@ -541,7 +541,7 @@ const HomePage = () => {
 
         {isConfirmed && (
          <div className="download-section">
-         <h4>Please wait for our website to navigate you to a new Google Sheet tab.<br /> You can check your data there.</h4>
+         <h4>Please wait for our website to navigate you to a new Google Sheet tab. You can check your data there.</h4>
          
          <h3>This file with selected columns can be downloaded <br /> only once here.</h3>
          <h2>Be sure to click download to save your file.</h2>
