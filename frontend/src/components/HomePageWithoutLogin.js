@@ -129,23 +129,26 @@ const HomePageWithoutLogin = () => {
 
     console.log("Sending structured data:", selectedData);
 
-    try {
-        const [excelResponse, sheetResponse] = await Promise.all([
-            axios.post(`http://localhost:13889/paperless/exportToExcelFile/${fileID}`, { selectedData }),
-            axios.post(`http://localhost:13889/paperless/exportToGoogleSheet/${fileID}`, { selectedData })
-        ]);
+    const newTab = window.open('', '_blank'); // Open immediately before async logic
 
-        if (excelResponse.status === 200 && sheetResponse.status === 200) {
-            const newTab = window.open('', '_blank'); 
-            alert("Excel file and Google Sheet created successfully!");
-            newTab.location.href = sheetResponse.data.sheetUrl; // เปิด Google Sheet
-        }
+try {
+    const [excelResponse, sheetResponse] = await Promise.all([
+        axios.post(`http://localhost:13889/paperless/exportToExcelFile/${fileID}`, { selectedData }),
+        axios.post(`http://localhost:13889/paperless/exportToGoogleSheet/${fileID}`, { selectedData })
+    ]);
 
-    } catch (error) {
-        console.error("Error confirming selection:", error.response ? error.response.data : error.message);
-        alert("Failed to create files.");
+    if (excelResponse.status === 200 && sheetResponse.status === 200) {
+        alert("Excel file and Google Sheet created successfully!");
+        newTab.location.href = sheetResponse.data.sheetUrl;
     }
+} catch (error) {
+    console.error("Error confirming selection:", error.response ? error.response.data : error.message);
+    alert("Failed to create files.");
+    if (newTab) newTab.close(); // Optional: close tab if error
+}
+
 };
+
 
 
   const handleDownload = async (file_ID) => {
