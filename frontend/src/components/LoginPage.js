@@ -11,7 +11,6 @@ const LoginPage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         
-        // Check for empty fields
         if (!username || !password) {
             alert('All fields are required.');
             return;

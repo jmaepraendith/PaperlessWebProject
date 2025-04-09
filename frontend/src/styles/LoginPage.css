@@ -92,12 +92,10 @@ p a:hover {
     text-decoration: underline;
 }
 
-/* Fix for submit_button vs submit_login inconsistency */
 .submit_button:hover {
     background-color: #073127;
 }
 
-/* Make form width responsive */
 form {
     width: 100%;
     max-width: 400px;
@@ -106,7 +104,6 @@ form {
     align-items: center;
 }
 
-/* Media query for mobile devices */
 @media (max-width: 480px) {
     .login-container {
         padding: 15px;
@@ -149,7 +146,6 @@ form {
     }
 }
 
-/* Media query for very small devices */
 @media (max-width: 320px) {
     .logo-login {
         max-width: 150px;

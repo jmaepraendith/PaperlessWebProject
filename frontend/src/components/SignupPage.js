@@ -101,7 +101,7 @@ const SignupPage = () => {
     
     return (
         <div className="signup-container">
-            {/* Left Column - Branding Section */}
+            
             <div className="signup-left">
                 <img src="/greenlogo.png" alt="Paperless Flow Logo" className="logo-signup" />
                 <div className="signup-left-content">
@@ -114,7 +114,6 @@ const SignupPage = () => {
                 </div>
             </div>
             
-            {/* Right Column - Form Section */}
             <div className="signup-right">
                 <h1 className="signup-h1">Create an account</h1>
                 

@@ -12,7 +12,6 @@ const ResetPasswordPage = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    // Function to request verification code
     const handleGetCode = async (e) => {
         e.preventDefault();
         
@@ -25,7 +24,7 @@ const ResetPasswordPage = () => {
         try {
             const response = await axios.post('http://localhost:13889/paperless/reset-password', { username });
             alert(response.data.message);
-            setStep(2); // Move to the next step
+            setStep(2); 
         } catch (error) {
             alert(error.response?.data?.error || 'Error sending verification code.');
         } finally {
@@ -33,7 +32,6 @@ const ResetPasswordPage = () => {
         }
     };
 
-    // Function to verify code and update password
     const handleConfirmCode = async (e) => {
         e.preventDefault();
         
@@ -42,7 +40,6 @@ const ResetPasswordPage = () => {
             return;
         }
 
-        // Check for password match
         if (newPassword !== confirmPassword) {
             alert('Passwords do not match. Please try again.');
             return;

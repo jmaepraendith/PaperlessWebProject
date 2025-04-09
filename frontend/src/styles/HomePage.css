@@ -14,7 +14,6 @@ button {
   font-family: 'IBM Plex Mono', monospace;
 }
 
-/* Header styles matching ActivityPage */
 header {
   position: fixed;
   height: 85px;
@@ -35,8 +34,6 @@ header {
   align-items: center;
 }
 
-
-/* Hamburger menu */
 .hamburger {
   display: none;
   flex-direction: column;
@@ -87,9 +84,7 @@ header {
   transform: translateY(-2px);
 }
 
-/* Homepage container */
 .homepage-container {
-  /* margin-top: 100px; */
   padding: 20px 40px;
   text-align: center;
   max-width: 1200px;
@@ -97,8 +92,6 @@ header {
   margin-right: auto;
 }
 
-
-/* File input and buttons */
 .upload-container {
   margin: 20px auto;
   display: flex;
@@ -190,7 +183,6 @@ input[type="file"]:hover {
   border-radius: 5px;
 }
 
-/* Upload progress */
 progress {
   height: 12px;
   border-radius: 10px;
@@ -207,25 +199,10 @@ progress::-webkit-progress-value {
   border-radius: 10px;
 }
 
-/* File options section */
 .file-options {
   margin-top: 30px;
   padding: 25px;
 }
-
-/* .download-section {
-  margin-top: 30px;
-  background: #f0f7f4;
-  padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-  border: 1px solid #004838;
-  max-width: 600px;     
-  width: 80%;          
-  margin-left: auto;   
-  margin-right: auto;  
-} */
-
 
 .download-section {
   margin-top: 50px;
@@ -243,17 +220,6 @@ progress::-webkit-progress-value {
   position: relative;
   overflow: hidden;
 }
-/* 
-.download-section::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(to right, #004838, #2a9d8f, #8cd6c6);
-  border-radius: 16px 16px 0 0;
-} */
 
 .download-section h4 {
   color: #555;
@@ -416,7 +382,6 @@ progress::-webkit-progress-value {
   background-color: #f5e9e9;
 }
 
-/* Responsive styles */
 @media (max-width: 768px) {
   header {
     padding: 15px;
@@ -534,7 +499,7 @@ progress::-webkit-progress-value {
 }
 
 .scrolling-banner-container {
-  margin-top: 85px; /* match header height */
+  margin-top: 85px; 
   z-index: 999;
 }
 

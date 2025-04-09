@@ -27,7 +27,7 @@ const ActivityPage = () => {
   }, [username]);
 
   useEffect(() => {
-    // Close user dropdown when clicking outside
+    
     const handleClickOutside = (event) => {
       if (userDropdownOpen && !event.target.closest('.user-dropdown-container')) {
         setUserDropdownOpen(false);
@@ -83,7 +83,7 @@ const ActivityPage = () => {
 
         if (response.status === 200) {
             alert("Your project has been deleted successfully!");
-            window.location.reload(); // Refresh the page or redirect as needed
+            window.location.reload(); 
         }
     } catch (error) {
         console.error("Error deleting project:", error);
@@ -108,7 +108,7 @@ const ActivityPage = () => {
         const data = await response.json();
         console.log("File Response Data:", data);
 
-        if (data.sheetUrl) {  // Changed from data.fileUrl to data.sheetUrl
+        if (data.sheetUrl) {  
             console.log("Opening file:", data.sheetUrl);
             window.open(data.sheetUrl, '_blank');
         } else {
@@ -143,7 +143,7 @@ const ActivityPage = () => {
   };
 
   const toggleUserDropdown = (e) => {
-    e.stopPropagation(); // Prevent event bubbling
+    e.stopPropagation(); 
     setUserDropdownOpen(!userDropdownOpen);
   };
 
@@ -154,8 +154,7 @@ const ActivityPage = () => {
   };
   
   const handleChangePassword = () => {
-    // Add your change password logic here
-    navigate("/changepassword"); // Adjust this to your actual route
+    navigate("/changepassword"); 
   };
 
   return (
@@ -163,7 +162,7 @@ const ActivityPage = () => {
       <header>
         <div className="header-left">
           <img src="/headerLogo.png" alt="Paperless Flow Logo" className="logo-activity" />
-          {/* Hamburger menu moved here - next to logo */}
+          
           <div className="hamburger" onClick={toggleMenu}>
             <span></span>
             <span></span>

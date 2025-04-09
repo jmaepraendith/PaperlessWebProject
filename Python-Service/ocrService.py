@@ -1,4 +1,3 @@
-
 import os
 import cv2
 import numpy as np
@@ -12,16 +11,13 @@ import requests
 app = Flask(__name__)
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
 
-# Configure your Gemini API key
 genai.configure(api_key="AIzaSyDoff8KD1r-hYc7xT1cms1aSuexdAlZWxA")
 
-# Node.js backend URL (adjust as needed)
 NODE_BACKEND_URL = "http://localhost:13889/process"
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# --- Preprocessing functions ---
 def deskew_image(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     edges = cv2.Canny(gray, 50, 150, apertureSize=3)
@@ -53,7 +49,7 @@ def preprocess_image(image_path):
     processed = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
     return processed
 
-# --- OCR extraction ---
+# OCR extraction 
 def extract_text(image_path):
     image = preprocess_image(image_path)
     pil_image = Image.fromarray(image)
@@ -62,7 +58,7 @@ def extract_text(image_path):
     print(tesseract_text)
     return tesseract_text
 
-# --- LLM formatting helper ---
+# LLM formatting 
 def llm_format_data(text, doc_type, image_path):
     if doc_type == "Bill":
         prompt = (
@@ -149,13 +145,12 @@ def llm_format_data(text, doc_type, image_path):
         response = genai.GenerativeModel("gemini-1.5-flash").generate_content(prompt) 
         
         output_text = response.text.strip()
-        # print("LLM raw output:", output_text)
         return output_text
     except Exception as e:
         print("LLM formatting error:", e)
         return {}
 
-# --- LLM document classification ---
+# classification by llm
 def classify_document(text):
     prompt = (
         "You are an expert document classifier. Classify the following OCR extracted text into one of three categories: "
@@ -175,7 +170,6 @@ def classify_document(text):
             return "Unknown"
     except Exception as e:
         print("LLM classification error:", e)
-        # Fallback to simple keyword-based classification
         lower_text = text.lower()
         if "tax invoice" in lower_text or "vat" in lower_text or "ภาษีมูลค่าเพิ่ม" in lower_text:
             return "Invoice"
@@ -186,7 +180,6 @@ def classify_document(text):
         else:
             return "Unknown"
 
-# --- Send JSON to Node.js backend ---
 def send_to_node_backend(json_data, filename):
     try:
         response = requests.post(NODE_BACKEND_URL, json=json_data)
@@ -212,19 +205,15 @@ def extract():
             filepath = os.path.join(temp_folder, file.filename)
             file.save(filepath)
             raw_text = extract_text(filepath)
-            # Use LLM to classify the document type
             doc_type = classify_document(raw_text)
-            # Format the OCR text using Gemini based on doc type
             formatted_data = llm_format_data(raw_text, doc_type, file.filename)
             print("formatted_data: " + formatted_data)
             
-            # Append the result for this file to the list.
             all_formatted_data.append({
                 "filename": file.filename,
                 "formatted_data": formatted_data
             })
             
-            # Optionally remove the temp file
             os.remove(filepath)
 
     print("all_formatted_data: ", all_formatted_data)

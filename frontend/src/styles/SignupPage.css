@@ -467,7 +467,7 @@ label {
 .pdpa-label input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    accent-color: #005f43; /* สีเดียวกับปุ่ม Sign Up */
+    accent-color: #005f43; 
     cursor: pointer;
 }
 
@@ -503,7 +503,7 @@ label {
     box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
     position: absolute;
     z-index: 1;
-    bottom: 125%; /* Show above the text */
+    bottom: 125%; 
     left: 0;
     opacity: 0;
     transition: opacity 0.3s;

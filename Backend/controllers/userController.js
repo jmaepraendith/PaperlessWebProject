@@ -104,7 +104,7 @@ exports.resetPassword = async (req, res) => {
         }
 
         const verificationCode = crypto.randomBytes(3).toString('hex').toUpperCase();
-        verificationCodes[username] = verificationCode; // Store code temporarily
+        verificationCodes[username] = verificationCode; 
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',

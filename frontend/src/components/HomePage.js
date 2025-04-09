@@ -26,7 +26,7 @@ const HomePage = () => {
   const fetchUserFiles = async () => {
     try {
       const response = await axios.get(`http://localhost:13889/paperless/activities/${username}`);
-      setUserFiles(response.data); // สมมติว่า response.data เป็น array ของไฟล์
+      setUserFiles(response.data); 
     } catch (error) {
       console.error("Error fetching user files:", error);
       alert("Failed to fetch user files.");
@@ -41,13 +41,6 @@ const HomePage = () => {
   };
   
 
-
-  // Handle file selection
-  // const handleFileChange = (e) => {
-  //   setFiles([...e.target.files]);
-  //   setUploadProgress(0);
-  // };
-
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     setFiles(selectedFiles);
@@ -57,46 +50,6 @@ const HomePage = () => {
     setPreviewUrls(urls);
   };
   
-
-  // const handleUpload = async () => {
-  //   if (files.length === 0) {
-  //     alert("Please select at least one file!");
-  //     return;
-  //   }
-  //   setProcessing(true);
-  //   const formData = new FormData();
-  //   files.forEach(file => {
-  //     formData.append('files', file);
-  //   });
-  //   formData.append('username', username);
-
-  //   try {
-
-  //     const response = await axios.post('http://localhost:13889/paperless/process', formData, {
-  //       headers: { 'Content-Type': 'multipart/form-data' },
-  //       onUploadProgress: (progressEvent) => {
-  //         const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-  //         setUploadProgress(percentCompleted);
-  //       }
-  //     });
-
-  //     setFileID(response.data.file_ID);
-  //     setJsonData(response.data);
-
-  //     alert("Files processed successfully!");  
-
-  //     // Fetch available columns based on file ID
-  //     fetchColumns(response.data.file_ID);
-
-  //   } catch (error) {
-  //     console.error("Error processing files:", error);
-  //     alert("Failed to process files.");
-  //   } finally {
-  //     setProcessing(false);
-  //   }
-  // };
-
-
   const handleUpload = async () => {
     if (!uploadMode) {
       alert("Please select upload mode (Create new or Append).");
@@ -122,7 +75,6 @@ const HomePage = () => {
       let response;
   
       if (uploadMode === 'new') {
-        // 🆕 CREATE NEW PROJECT
         response = await axios.post('http://localhost:13889/paperless/process', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
           onUploadProgress: (progressEvent) => {
@@ -137,7 +89,6 @@ const HomePage = () => {
         fetchColumns(response.data.file_ID);
   
       } else if (uploadMode === 'append') {
-        // 🔁 APPEND INTO EXISTING FILE
         formData.append('target_file_ID', selectedAppendFileID);
   
         response = await axios.post('http://localhost:13889/paperless/processintoexistfile', formData, {
@@ -164,7 +115,6 @@ const HomePage = () => {
   };
   
   
-  // Fetch columns from the backend
   const fetchColumns = async (file_ID) => {
     try {
       const response = await axios.get(`http://localhost:13889/paperless/get-column-each-table/${file_ID}`);
@@ -186,7 +136,6 @@ const HomePage = () => {
     }
   };
 
-  // for column selection 
   const toggleColumnSelection = (tableName, column) => {
     setSelectedColumns(prev => {
       const updatedTableColumns = prev[tableName] || [];
@@ -200,50 +149,9 @@ const HomePage = () => {
     });
   };
   
-  // const handleConfirmSelection = async (fileID) => {
-  //   // Check if any columns are selected
-  //   const hasSelectedColumns = Object.values(selectedColumns).some(
-  //     columnArray => columnArray && columnArray.length > 0
-  //   );
-    
-  //   if (!hasSelectedColumns) {
-  //     alert("Please select at least one column!");
-  //     return;
-  //   }
-    
-  //   setIsConfirmed(true);
-
-  //   const selectedData = availableColumns
-  //     .map((table) => ({
-  //       table: table.table,
-  //       selectedColumns: selectedColumns[table.table] || [] 
-  //     }))
-  //     .filter(table => table.selectedColumns.length > 0);
-
-  //   console.log("Sending structured data:", selectedData);
-
-  //   try {
-  //     const response = await axios.post(
-  //       // `http://localhost:13889/paperless/exportToExcelFile/${fileID}`, 
-  //       // { selectedData } 
-  //       `http://localhost:13889/paperless/exportToGoogleSheet/${fileID}`, 
-  //       { selectedData } 
-  //     );
-
-  //     if (response.status === 200) {
-  //       const newTab = window.open('', '_blank'); // เปิดแท็บใหม่ไว้ก่อน
-  //       alert("Excel file created successfully!");
-  //       newTab.location.href = response.data.sheetUrl; // เปลี่ยน URL หลัง alert
-  //     }
-      
-  //   } catch (error) {
-  //     console.error("Error confirming selection:", error.response ? error.response.data : error.message);
-  //     alert("Failed to create Excel file.");
-  //   }
-  // };
 
   const handleConfirmSelection = async (fileID) => {
-    // Check if any columns are selected
+    
     const hasSelectedColumns = Object.values(selectedColumns).some(
       columnArray => columnArray && columnArray.length > 0
     );
@@ -263,7 +171,7 @@ const HomePage = () => {
       .filter(table => table.selectedColumns.length > 0);
 
     console.log("Sending structured data:", selectedData);
-
+    const newTab = window.open('', '_blank'); 
     try {
         const [excelResponse, sheetResponse] = await Promise.all([
             axios.post(`http://localhost:13889/paperless/exportToExcelFile/${fileID}`, { selectedData }),
@@ -271,9 +179,9 @@ const HomePage = () => {
         ]);
 
         if (excelResponse.status === 200 && sheetResponse.status === 200) {
-            const newTab = window.open('', '_blank'); 
+            
             alert("Excel file and Google Sheet created successfully!");
-            newTab.location.href = sheetResponse.data.sheetUrl; // เปิด Google Sheet
+            newTab.location.href = sheetResponse.data.sheetUrl; 
         }
 
     } catch (error) {
@@ -286,7 +194,7 @@ const HomePage = () => {
   const handleDownload = async (file_ID) => {
     try {
       const response = await axios.get(`http://localhost:13889/paperless/getExcelFile/${file_ID}`, {
-        responseType: 'blob'  // Ensures file is downloaded as binary
+        responseType: 'blob' 
       });
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -393,7 +301,7 @@ const HomePage = () => {
             overflowY: 'hidden',
             whiteSpace: 'nowrap',
             paddingBottom: '0.5rem',
-            borderBottom: '2px solid #ccc' // optional visual separation
+            borderBottom: '2px solid #ccc' 
           }}>
             <div style={{
               display: 'inline-flex',

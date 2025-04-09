@@ -15,7 +15,6 @@ exports.allcolumnExcelFile = async (req, res) => {
             return res.status(404).json({ message: "Project not found" });
         }
 
-        // Fetch only tables that contain data for the given file_ID
         const tablesWithData = [];
 
         const bills = await Bill.findAll({ where: { file_ID } });
@@ -27,7 +26,6 @@ exports.allcolumnExcelFile = async (req, res) => {
         const purchaseOrders = await PurchaseOrder.findAll({ where: { file_ID } });
         if (purchaseOrders.length > 0) tablesWithData.push({ name: "Purchase Orders", data: purchaseOrders });
 
-        // If no tables have data, return an error
         if (tablesWithData.length === 0) {
             return res.status(404).json({ message: "No relevant data found for export" });
         }
@@ -46,7 +44,6 @@ exports.allcolumnExcelFile = async (req, res) => {
             }
         };
 
-        // Add only tables that have data
         tablesWithData.forEach(table => addSheet(workbook, table.name, table.data));
 
         res.setHeader(
@@ -119,7 +116,6 @@ exports.getAllProject = async (req, res) => {
             }).format(new Date(date));
         };
 
-        // Map through projects and modify file_name if it's null
         const formattedProjects = projects.map(project => ({
             file_ID: project.file_ID,
             file_name: project.file_name ? project.file_name : project.file_ID, 
@@ -157,43 +153,6 @@ exports.updateFileName = async (req, res) => {
     }
 };
 
-
-// exports.getColumnEachTable = async (req, res) => {
-//     try {
-//         const { file_ID } = req.params;
-
-//         const project = await Project.findOne({ where: { file_ID } });
-//         if (!project) {
-//             return res.status(404).json({ message: "Project not found" });
-//         }
-
-//         const billExists = await Bill.findOne({ where: { file_ID } });
-//         const invoiceExists = await Invoice.findOne({ where: { file_ID } });
-//         const purchaseOrderExists = await PurchaseOrder.findOne({ where: { file_ID } });
-
-//         let tablesWithfile_ID = [];
-//         if (billExists) tablesWithfile_ID.push("Bill");
-//         if (invoiceExists) tablesWithfile_ID.push("Invoice");
-//         if (purchaseOrderExists) tablesWithfile_ID.push("PurchaseOrder");
-
-//         const ColumnEachTable = await Promise.all(
-//             tablesWithfile_ID.map(async (tableName) => {
-//                 const tableColumns = await sequelize.getQueryInterface().describeTable(tableName);
-//                 return {
-//                     table: tableName,
-//                     columns: Object.keys(tableColumns).map(col => col.replace(/_/g, ' ')) // Extract column names
-//                 };
-//             })
-//         );
-
-//         return res.status(200).json(ColumnEachTable);
-//     } catch (error) {
-//         console.error("Error fetching columns:", error);
-//         return res.status(500).json({ message: "Internal server error" });
-//     }
-// };
-
-
 exports.getColumnEachTable = async (req, res) => {
     try {
         const { file_ID } = req.params;
@@ -216,7 +175,6 @@ exports.getColumnEachTable = async (req, res) => {
             tablesWithfile_ID.map(async (tableName) => {
                 const tableColumns = await sequelize.getQueryInterface().describeTable(tableName);
 
-                // Get one sample record
                 const [record] = await sequelize.models[tableName].findAll({
                     where: { file_ID },
                     limit: 1,
@@ -313,7 +271,6 @@ exports.exportToExcelFile = async (req, res) => {
             fs.mkdirSync(exportDir, { recursive: true });
         }
 
-        // Save Excel file
         const filePath = path.join(exportDir, `Project_${file_ID}.xlsx`);
         await workbook.xlsx.writeFile(filePath);
 
@@ -350,17 +307,9 @@ exports.getExcelFile = async (req, res) => {
 
             console.log(`File sent for download: ${filePath}`);
 
-            // Delete the file after successful sent
             fs.unlinkSync(filePath);
             console.log("File deleted from local exports folder:", filePath);
 
-            // Upload the file to Google Drive after successful download
-            // const fileUrl = await uploadToGoogleDrive(filePath);
-            // if (fileUrl) {
-            //     console.log(`File uploaded to Google Drive: ${fileUrl}`);
-            // } else {
-            //     console.error("Failed to upload file to Google Drive.");
-            // }
         });
 
     } catch (error) {
@@ -378,9 +327,6 @@ const path = require('path');
 const fs = require('fs');
 const apikeys = require(path.join(__dirname, '../paperlessAPI.json'));
 
-
-
-
 async function authorize() {
     const jwtClient = new google.auth.JWT(
         apikeys.client_email,
@@ -391,93 +337,6 @@ async function authorize() {
     await jwtClient.authorize();
     return jwtClient;
 }
-
-
-// const uploadToGoogleDrive = async (filePath) => {
-//     try {
-//         if (!fs.existsSync(filePath)) {
-//             console.error("File does not exist:", filePath);
-//             return null;
-//         }
-
-//         const authClient = await authorize();
-//         const drive = google.drive({ version: 'v3', auth: authClient });
-
-//         const fileMetadata = {
-//             name: path.basename(filePath),
-//             // parents: ["11Vz-D_TgIRhkixXY5wr6xZnvqejx2Lxe"], //  folder ID jj
-//             parents: ["1C5bpzb5kU4K2a4MlyecLTk8BvxjClQri"], //  folder ID jp
-//         };
-
-//         const media = {
-//             mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-//             body: fs.createReadStream(filePath),
-//         };
-
-//         const file = await drive.files.create({
-//             resource: fileMetadata,
-//             media: media,
-//             fields: 'id',
-//         });
-
-//         await drive.permissions.create({
-//             fileId: file.data.id,
-//             requestBody: {
-//                 role: 'writer',
-//                 type: 'anyone',
-//             },
-//         });
-
-//         const fileUrl = `https://drive.google.com/file/d/${file.data.id}/view`;
-
-//         console.log("File uploaded to Google Drive:", fileUrl);
-
-//         // Delete the file after successful upload
-//         fs.unlinkSync(filePath);
-//         console.log("File deleted from local exports folder:", filePath);
-
-//         return fileUrl;
-
-//     } catch (error) {
-//         console.error("Error uploading to Google Drive:", error);
-//         return null;
-//     }
-// };
-
-
-// exports.getFileLinkfromDrive = async (req, res) => {
-//     try {
-//         const { file_ID } = req.params;
-
-//         if (!file_ID) {
-//             return res.status(400).json({ message: "File ID is required." });
-//         }
-
-//         const authClient = await authorize();
-//         const drive = google.drive({ version: 'v3', auth: authClient });
-
-//         const fileName = `Project_${file_ID}.xlsx`;
-//         const response = await drive.files.list({
-//             q: `name='${fileName}' and trashed=false`,
-//             fields: 'files(id, name)',
-//         });
-
-//         if (response.data.files.length === 0) {
-//             return res.status(404).json({ message: "File not found on Google Drive." });
-//         }
-
-//         const fileId = response.data.files[0].id;
-//         const fileUrl = `https://drive.google.com/file/d/${fileId}/view`;
-
-//         res.json({ fileUrl });
-
-//     } catch (error) {
-//         console.error("Error fetching file from Google Drive:", error);
-//         res.status(500).json({ message: "Internal Server Error" });
-//     }
-// };
-
-
 
 exports.deleteRecordsbyfileID = async (req, res) => {
     try {
@@ -503,26 +362,6 @@ exports.deleteRecordsbyfileID = async (req, res) => {
         }
 
         await Project.destroy({ where: { file_ID } });
-
-
-        // const authClient = await authorize();
-        // const drive = google.drive({ version: 'v3', auth: authClient });
-
-        // const fileName = `Project_${file_ID}.xlsx`;
-
-        // // Find the file in Google Drive
-        // const response = await drive.files.list({
-        //     q: `name='${fileName}' and trashed=false`,
-        //     fields: 'files(id, name)',
-        // });
-
-        // if (response.data.files.length === 0) {
-        //     console.log(`File ${fileName} not found on Google Drive.`);
-        //     return res.status(200).json({ message: "Project deleted, but no matching file found in Google Drive." });
-        // }
-        // const fileId = response.data.files[0].id;
-        // await drive.files.delete({ fileId });
-
         return res.status(200).json({ message: "Your project has been deleted successfully"});
 
     } catch (error) {
@@ -555,8 +394,6 @@ exports.getExcelFileGuest = async (req, res) => {
 
             console.log(`File sent for download: ${filePath}`);
 
-            // after successful download
-            // Delete the file after successful download
             fs.unlinkSync(filePath);
             console.log("File deleted from local exports folder:", filePath);
     
@@ -667,7 +504,6 @@ const uploadToGoogleSheetWithSelection = async (file_ID, tablesWithSelectedData)
         const spreadsheetId = sheetResponse.data.spreadsheetId;
         let createdSheetIds = [];
 
-        // สร้างชีตใหม่ตามตารางที่เลือก
         for (const table of tablesWithSelectedData) {
             const sheetName = table.name;
             const selectedCols = table.columns;
@@ -688,7 +524,6 @@ const uploadToGoogleSheetWithSelection = async (file_ID, tablesWithSelectedData)
                 },
             });
 
-            // เก็บ sheetId ของชีตที่สร้าง
             const newSheetId = addSheetResponse.data.replies[0].addSheet.properties.sheetId;
             createdSheetIds.push(newSheetId);
 
@@ -700,7 +535,6 @@ const uploadToGoogleSheetWithSelection = async (file_ID, tablesWithSelectedData)
             });
         }
 
-        // ลบ Sheet1 ถ้ามี (และต้องแน่ใจว่ามีชีตอื่นอยู่ก่อน)
         const sheetsInfo = await sheets.spreadsheets.get({ spreadsheetId });
         const sheet1 = sheetsInfo.data.sheets.find(s => s.properties.title === "Sheet1");
 
@@ -737,7 +571,6 @@ const uploadToGoogleSheetCustomize = async (file_ID, data) => {
         const sheets = google.sheets({ version: "v4", auth: authClient });
         const drive = google.drive({ version: "v3", auth: authClient });
 
-        // 🔹 Create new Google Sheet
         const sheetResponse = await sheets.spreadsheets.create({
             resource: { properties: { title: `Project_${file_ID}` } },
         });
@@ -745,7 +578,6 @@ const uploadToGoogleSheetCustomize = async (file_ID, data) => {
         const spreadsheetId = sheetResponse.data.spreadsheetId;
         console.log(`Created Spreadsheet: https://docs.google.com/spreadsheets/d/${spreadsheetId}`);
 
-        // 🔹 First create all the sheets we need
         const requests = data.map(table => ({
             addSheet: { properties: { title: table.name } }
         }));
@@ -755,19 +587,17 @@ const uploadToGoogleSheetCustomize = async (file_ID, data) => {
             resource: { requests },
         });
 
-        // 🔹 Now we can safely delete Sheet1 since we have other sheets
         await sheets.spreadsheets.batchUpdate({
             spreadsheetId,
             resource: {
                 requests: [{
                     deleteSheet: {
-                        sheetId: 0  // Sheet1 always has sheetId 0 in a new spreadsheet
+                        sheetId: 0 
                     }
                 }],
             },
         });
 
-        // 🔹 Insert data into each sheet
         for (const table of data) {
             const sheetName = table.name;
             const values = [
@@ -783,7 +613,6 @@ const uploadToGoogleSheetCustomize = async (file_ID, data) => {
             });
         }
 
-        // 🔥 Set permissions to allow anyone to edit
         await drive.permissions.create({
             fileId: spreadsheetId,
             requestBody: {
@@ -807,13 +636,11 @@ exports.exportToGoogleSheetCustomize = async (req, res) => {
             return res.status(400).json({ message: "File ID is required." });
         }
 
-        // 🔹 ค้นหาโครงการจาก file_ID
         const project = await Project.findOne({ where: { file_ID } });
         if (!project) {
             return res.status(404).json({ message: "Project not found" });
         }
 
-        // 🔹 ดึงข้อมูลจากฐานข้อมูล
         const tablesWithData = [];
         const bills = await Bill.findAll({ where: { file_ID } });
         if (bills.length > 0) tablesWithData.push({ name: "Bills", data: bills });
@@ -828,7 +655,6 @@ exports.exportToGoogleSheetCustomize = async (req, res) => {
             return res.status(404).json({ message: "No relevant data found for export" });
         }
 
-        // 🔥 อัปโหลดไปยัง Google Sheets
         const sheetUrl = await uploadToGoogleSheetCustomize(file_ID, tablesWithData);
         if (!sheetUrl) {
             return res.status(500).json({ message: "Failed to create Google Sheet." });

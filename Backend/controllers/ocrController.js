@@ -8,7 +8,7 @@ const Bill = require('../models/Bill');
 const Invoice = require('../models/Invoice');
 const PurchaseOrder = require('../models/PurchaseOrder');
 
-// store files temporarily
+// temporarily store files
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'temp_uploads/'); // this folder have to exists
@@ -22,15 +22,12 @@ const upload = multer({ storage });
 function extractJsonObjects(ocrResults) {
   let dataStr = "";
   
-  // If ocrResults is a string, use it directly.
   if (typeof ocrResults === "string") {
     dataStr = ocrResults;
   }
-  // If it's an array (each element with a "formatted_data" field), combine.
   else if (Array.isArray(ocrResults)) {
     dataStr = ocrResults.map(item => item.formatted_data).join("\n");
   }
-  // If it's an object with a formatted_data property, use that.
   else if (ocrResults && ocrResults.formatted_data) {
     dataStr = ocrResults.formatted_data;
   } else {
@@ -40,7 +37,6 @@ function extractJsonObjects(ocrResults) {
 
   const jsonObjects = [];
   
-  // Use a regular expression to extract JSON code blocks wrapped in ```json ... ```
   const codeFenceRegex = /```json\s*([\s\S]*?)\s*```/gm;
   let matches = [];
   let match;
@@ -48,16 +44,13 @@ function extractJsonObjects(ocrResults) {
     matches.push(match[1]);
   }
   
-  // If no code fence blocks were found, push the entire dataStr.
   if (matches.length === 0) {
     matches.push(dataStr);
   }
   
-  // Parse each JSON block
   for (const jsonStr of matches) {
     try {
       const parsed = JSON.parse(jsonStr);
-      // If the parsed JSON is an array, add each element individually.
       if (Array.isArray(parsed)) {
         jsonObjects.push(...parsed);
       } else {
@@ -80,7 +73,6 @@ exports.processFiles = [
       
       const file_ID = uuidv4();
 
-      // Create a Project 
       const projectData = {
         file_ID,
         username: req.body.username,
@@ -89,26 +81,21 @@ exports.processFiles = [
       };
       await Project.create(projectData);
 
-      // Forward files to Python OCR service 
       const formData = new FormData();
       req.files.forEach(file => {
         formData.append('files', fs.createReadStream(file.path));
       });
 
-      // Call the Python OCR service
       const response = await axios.post('http://localhost:5001/extract', formData, {
         headers: formData.getHeaders(),
       });
 
-      // The OCR service returns a JSON
       const rawocrResults = response.data;
       let ocrResults = extractJsonObjects(rawocrResults);
       console.log("Extracted OCR Results:", ocrResults);
 
-      // Flatten the result in case it's nested
       ocrResults = Array.isArray(ocrResults[0]) ? ocrResults.flat() : ocrResults;
 
-      // Process each extracted JSON object based on its file_type
       for (const lineItem of ocrResults) {
         if (lineItem.file_type === 'Bill') {
           await Bill.create({
@@ -197,7 +184,6 @@ exports.processintoexistfile = [
       const file_ID = req.body.target_file_ID;
 
     
-      // Forward files to Python OCR service 
       const formData = new FormData();
       req.files.forEach(file => {
         formData.append('files', fs.createReadStream(file.path));
@@ -208,15 +194,12 @@ exports.processintoexistfile = [
         headers: formData.getHeaders(),
       });
 
-      // The OCR service returns a JSON
       const rawocrResults = response.data;
       let ocrResults = extractJsonObjects(rawocrResults);
       console.log("Extracted OCR Results:", ocrResults);
 
-      // Flatten the result in case it's nested
       ocrResults = Array.isArray(ocrResults[0]) ? ocrResults.flat() : ocrResults;
 
-      // Process each extracted JSON object based on its file_type
       for (const lineItem of ocrResults) {
         if (lineItem.file_type === 'Bill') {
           await Bill.create({
